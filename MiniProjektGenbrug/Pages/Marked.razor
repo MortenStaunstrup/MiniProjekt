@@ -5,6 +5,7 @@
 @inject NavigationManager navMan
 @inject IUserService loginService
 @inject IRoomService IRoomService
+@inject Blazored.LocalStorage.ILocalStorageService localstorage
 
 <PageTitle>Marked</PageTitle>
 
@@ -26,7 +27,7 @@ else
                             @article.id - @article.Description (Størrelse: @article.Size)
                             <span> @article.Price,- DKK</span>
                             <span> Status: @article.Status</span>
-                            <span>@IRoomService.GetRoomById().Name</span>
+                            <span>@IRoomService.GetRoomById(@article.RoomId).Name</span>
                         </div>
                         <div class="DivPic">
                             @article.Picture
@@ -49,7 +50,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await loginService.GetProductsById();
+        
+        currentUser = await localstorage.GetItemAsync<User>("user");
         if (currentUser == null)
         {
             navMan.NavigateTo("login");
