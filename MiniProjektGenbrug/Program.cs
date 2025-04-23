@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MiniProjektGenbrug;
@@ -13,7 +14,11 @@ builder.Services.AddSingleton(sp => new HttpClient
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
 });
 
+
+builder.Services.AddBlazoredLocalStorage();
+
 // Registrer din ProductService
 builder.Services.AddSingleton<IProductService, ProductServiceClient>();
+
 
 await builder.Build().RunAsync();
