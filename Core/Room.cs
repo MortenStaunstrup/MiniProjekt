@@ -7,5 +7,4 @@ public class Room
     public DateTime OpeningHour { get; set; }
     public DateTime ClosingHour { get; set; }
     public int Staffing { get; set; }
-    public List<Product> AttachedProducts { get; set; }
 }
