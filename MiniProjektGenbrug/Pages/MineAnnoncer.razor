@@ -1,0 +1,40 @@
+@page "/mineannoncer"
+@using Core
+
+<PageTitle>Dine Annoncer</PageTitle>
+
+<h1>Dine Annoncer</h1>
+
+@if (_dineAnnoncer == null)
+{
+    <p><i>...loading dine annoncer</i></p>
+}
+else
+{
+    <ul>
+        @foreach (var annonce in _dineAnnoncer)
+        {
+            <li>
+                <span>@annonce.Status</span>
+                <span>@annonce.Productname</span>
+                <span>@annonce.Price</span>
+                <span>@annonce.Picture</span>
+                <button>Rediger</button>
+            </li>
+        }
+    </ul>
+    <button>Tilføj</button>
+}
+
+
+@code {
+    
+    User currentUser;
+    List<Product> _dineAnnoncer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+}
