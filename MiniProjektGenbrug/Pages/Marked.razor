@@ -47,7 +47,7 @@ else
     private User? currentUser;
 
     private Dictionary<int, Room> productRoomMap = new();
-
+/* midlertidligt udkommenteret, spørger Umut
     protected override async Task OnInitializedAsync()
     {
         
@@ -61,7 +61,7 @@ else
             _products = _ProductService.GetProductsById().ToArray();
         }
     }
-
+*/
     private async Task ReturnProduct(int id)
     {
         if (currentUser != null)
