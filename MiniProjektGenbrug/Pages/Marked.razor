@@ -1,8 +1,10 @@
 @page "/marked"
 @using Core
+@using Services.Interfaces
 @inject IProductService _ProductService
 @inject NavigationManager navMan
-@inject ILoginService loginService
+@inject IUserService loginService
+@inject IRoomService IRoomService
 
 <PageTitle>Marked</PageTitle>
 
@@ -24,7 +26,7 @@ else
                             @article.id - @article.Description (Størrelse: @article.Size)
                             <span> @article.Price,- DKK</span>
                             <span> Status: @article.Status</span>
-                            <span>@(productRoomMap.ContainsKey(article.id) ? productRoomMap[article.id].Name : "Ukendt rum")</span>
+                            <span>@IRoomService.GetRoomById().Name</span>
                         </div>
                         <div class="DivPic">
                             @article.Picture
@@ -40,39 +42,29 @@ else
 
 @code {
 
-    private Product[]? _products;
+    private Product[] _products;
     private User? currentUser;
 
     private Dictionary<int, Room> productRoomMap = new();
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await loginService.GetUserLoggedIn();
+        currentUser = await loginService.GetProductsById();
         if (currentUser == null)
         {
             navMan.NavigateTo("login");
         }
         else
         {
-            _products = await _ProductService.GetClothingByUser(currentUser.id);
-            var rooms = await _ProductService.GetRooms(); // antaget du har en metode der henter alle rooms
-
-            foreach (var room in rooms)
-            {
-                foreach (var prod in room.AttachedProducts)
-                {
-                    productRoomMap[prod.id] = room;
-                }
-            }
+            _products = _ProductService.GetProductsById().ToArray();
         }
     }
 
-    
     private async Task ReturnProduct(int id)
     {
         if (currentUser != null)
         {
-            _products = await _ProductService.GetClothingByUser(currentUser.id); // Opdatere tøjet
+            _products = _ProductService.GetProductsById().ToArray(); // Opdatere tøjet
         }
     }
 }
