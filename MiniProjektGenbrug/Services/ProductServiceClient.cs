@@ -45,7 +45,7 @@ public class ProductServiceClient : IProductService
                 Picture = "smartphone_silver.jpg",
                 Size = "N/A",
                 Status = "Sold",
-                BuyerId = 45
+                BuyerId = null
             },
             new Product 
             {
@@ -71,7 +71,7 @@ public class ProductServiceClient : IProductService
                 Picture = "laptop_gray.jpg",
                 Size = "N/A",
                 Status = "Pending",
-                BuyerId = 23
+                BuyerId = null
             }
         };
     
