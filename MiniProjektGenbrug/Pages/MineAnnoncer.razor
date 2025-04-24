@@ -37,6 +37,7 @@ else
                         <span class="statusClass">Status: @annonce.Status</span>
                         <span class="priceClass">@annonce.Price</span>
                         <button class="buttonClass">Rediger</button>
+                        <button @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
                     </div>
                 </div>
             </li>
@@ -69,7 +70,8 @@ else
         var theDataSavedInLocalstorage = new User()
         {
             id = theUser.id,
-            Username = theUser.Username
+            Username = theUser.Username,
+            Role = theUser.Role
         };
         await localStorage.SetItemAsync("user",theDataSavedInLocalstorage);
         //
@@ -80,7 +82,18 @@ else
         }
         
         // Test kode, giver alle produkter ikke kun brugers !!!!!!
-        _dineAnnoncer = await productService.GetProductsById();
+        _dineAnnoncer = await productService.GetAllProducts();
+    }
+
+    private void DeleteAnnonce(int id)
+    {
+        //--------------------------
+        // Kode til at slette i bruger collection
+        //--------------------------
+        
+        productService.DeleteProductById(id);
+        _dineAnnoncer.RemoveAll(x => x.id == id);
+        StateHasChanged();
     }
 
 }

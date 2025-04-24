@@ -75,7 +75,7 @@ public class ProductServiceClient : IProductService
             }
         };
     
-    public async Task<List<Product>> GetProductsById()
+    public async Task<List<Product>> GetAllProducts()
     {
         return products;
     }

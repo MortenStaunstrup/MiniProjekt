@@ -4,7 +4,7 @@ namespace MiniProjektGenbrug.Services.Interfaces;
 
 public interface IProductService
 { 
-    Task<List<Product>> GetProductsById();
+    Task<List<Product>> GetAllProducts();
     Task<Product> GetProductById(int id);
     void DeleteProductById(int id);
     void AddProduct(Product product);
