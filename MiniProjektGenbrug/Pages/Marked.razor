@@ -57,6 +57,7 @@ else
         currentUser = await localstorage.GetItemAsync<User>("user");
         _products = await _ProductService.GetAllProducts();
     }
+    
     /*
         if (currentUser == null)
         {
