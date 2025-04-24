@@ -11,8 +11,7 @@
     <EditForm Model="newAd" OnValidSubmit="AddAd">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        
-        
+
         <div class="form-grid">
             <div class="form-item">
                 <label>Pris:</label>
@@ -84,7 +83,11 @@
 
     private List<string> Room = new() { "A101", "A102", "A103", "A104", "A105", "A106", "A107", "A108", "A109", "A110" };
     private List<string> Categories = new() { "Bukser", "T-shirt", "Sko", "Sweater", "Nederdel", "Kjole", "Jakke" };
-    private List<string> Sizes = new() { "XS", "S", "M", "L", "XL" };
+
+    private List<string> ClothingSizes = new() { "XS", "S", "M", "L", "XL", "XXL", "XXXL"};
+    private List<string> ShoeSizes = new() { "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46" };
+
+    private List<string> Sizes => newAd.Category == "Sko" ? ShoeSizes : ClothingSizes;
 
     private async Task AddAd()
     {
@@ -96,9 +99,9 @@
             Color = newAd.Color,
             Size = newAd.Size,
             Description = newAd.Description,
-            Status = "Available", 
-            BuyerId = null, 
-            Picture = newAd.Picture 
+            Status = "Available",
+            BuyerId = null,
+            Picture = newAd.Picture
         };
 
         ProductService.AddProduct(newProduct);
@@ -111,11 +114,11 @@
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
-        var file = e.File; 
+        var file = e.File;
         if (file != null)
         {
             var filePath = "/images/" + file.Name;
-            newAd.Picture = filePath;  
+            newAd.Picture = filePath;
             Console.WriteLine("Billede valgt: " + file.Name);
         }
     }
@@ -129,6 +132,6 @@
         public string? Color { get; set; }
         public string? Size { get; set; }
         public string? Description { get; set; }
-        public string? Picture { get; set; } 
+        public string? Picture { get; set; }
     }
 }
