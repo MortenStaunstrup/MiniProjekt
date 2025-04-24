@@ -19,7 +19,7 @@ builder.Services.AddBlazoredLocalStorage();
 
 // Registrer din ProductService
 builder.Services.AddSingleton<IProductService, ProductServiceServer>();
-builder.Services.AddSingleton<IRoomService, RoomServiceClient>();
+builder.Services.AddSingleton<IRoomService, RoomServiceServer>();
 builder.Services.AddScoped<IUserService, UserServiceClient>();
 
 await builder.Build().RunAsync();

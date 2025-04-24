@@ -48,13 +48,29 @@ public class RoomServiceClient : IRoomService
             Staffing = 1
         }
     };
-    public List<Room> GetRooms()
+
+    public Task<List<Room>> GetRooms()
     {
-        return rooms;
+        throw new NotImplementedException();
     }
 
-    public Room GetRoomById(int id)
+    public Task<Room> GetRoomById(int id)
     {
-        return rooms.FirstOrDefault(x => x.id == id);
+        throw new NotImplementedException();
+    }
+
+    public void AddRoom(Room room)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UpdateRoomById(int id, Room room)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DeleteRoomById(int id)
+    {
+        throw new NotImplementedException();
     }
 }

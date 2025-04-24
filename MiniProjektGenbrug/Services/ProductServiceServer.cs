@@ -20,14 +20,14 @@ public class ProductServiceServer : IProductService
         return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/getall");
     }
 
-    public Task<Product> GetProductById(int id)
+    public async Task<Product> GetProductById(int id)
     {
-        throw new NotImplementedException();
+        return await _client.GetFromJsonAsync<Product>($"{BaseURL}/getbyid/{id}");
     }
 
     public void DeleteProductById(int id)
     {
-        throw new NotImplementedException();
+        _client.DeleteAsync($"{BaseURL}/delete/{id}");
     }
 
     public void AddProduct(Product product)
@@ -37,6 +37,6 @@ public class ProductServiceServer : IProductService
 
     public void UpdateProductById(int id, Product product)
     {
-        throw new NotImplementedException();
+        _client.PutAsJsonAsync($"{BaseURL}/update/{id}", product);
     }
 }
