@@ -75,12 +75,12 @@ public class ProductServiceClient : IProductService
             }
         };
     
-    public List<Product> GetProductsById()
+    public async Task<List<Product>> GetProductsById()
     {
         return products;
     }
 
-    public Product GetProductById(int id)
+    public async Task<Product> GetProductById(int id)
     {
         return products.FirstOrDefault(x => x.id == id);
     }

@@ -1,5 +1,11 @@
 @page "/mineannoncer"
+@using Blazored.LocalStorage
 @using Core
+@using MiniProjektGenbrug.Services.Interfaces
+@inject IUserService userService
+@inject NavigationManager navMan
+@inject ILocalStorageService localStorage
+@inject IProductService productService
 
 <PageTitle>Dine Annoncer</PageTitle>
 
@@ -15,11 +21,24 @@ else
         @foreach (var annonce in _dineAnnoncer)
         {
             <li>
-                <span>@annonce.Status</span>
-                <span>@annonce.Productname</span>
-                <span>@annonce.Price</span>
-                <span>@annonce.Picture</span>
-                <button>Rediger</button>
+                <div class="listItem">
+                    <div class="pictureDiv">
+                        <img src="data:image/jpg;base64,@annonce.Picture" alt="Picture of Item"/>
+                    </div>
+                    <div class="infoDiv">
+                        <span class="productNameClass">@annonce.Productname</span>
+                        <hr/>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque nec faucibus mi. Phasellus et euismod orci. Proin varius, felis id faucibus semper, urna nulla pharetra diam, vitae efficitur ante ligula id velit.</p>
+                        <ul class="specsList">
+                            <li>Type: @annonce.Category</li>
+                            <li>Farve: @annonce.Color</li>
+                            <li>Størrelse: @annonce.Size</li>
+                        </ul>
+                        <span class="statusClass">Status: @annonce.Status</span>
+                        <span class="priceClass">@annonce.Price</span>
+                        <button class="buttonClass">Rediger</button>
+                    </div>
+                </div>
             </li>
         }
     </ul>
@@ -29,12 +48,28 @@ else
 
 @code {
     
-    User currentUser;
-    List<Product> _dineAnnoncer;
+    User? currentUser;
+    List<Product>? _dineAnnoncer;
 
     protected override async Task OnInitializedAsync()
     {
+        // Test kode
+        var theUser = await userService.GetUserById(1);
+        var theDataSavedInLocalstorage = new User()
+        {
+            id = theUser.id,
+            Username = theUser.Username
+        };
+        await localStorage.SetItemAsync("user",theDataSavedInLocalstorage);
+        //
+        currentUser = await userService.GetUserLoggedIn();
+        if (currentUser == null)
+        {
+            navMan.NavigateTo("login");
+        }
         
+        // Test kode, giver alle produkter ikke kun brugers !!!!!!
+        _dineAnnoncer = await productService.GetProductsById();
     }
 
 }

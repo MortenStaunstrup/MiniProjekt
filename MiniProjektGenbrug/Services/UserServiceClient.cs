@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Core;
 using MiniProjektGenbrug.Services.Interfaces;
 
@@ -5,6 +6,13 @@ namespace MiniProjektGenbrug.Services;
 
 public class UserServiceClient : IUserService
 {
+
+    private ILocalStorageService localStorage { get; set; }
+    public UserServiceClient(ILocalStorageService localStorage)
+    {
+        this.localStorage = localStorage;
+    }
+    
     private List<User> users = new List<User>()
     {
         new User
@@ -12,7 +20,7 @@ public class UserServiceClient : IUserService
             id = 1,
             Username = "Jonathan",
             Password = "password1",
-            Rmail = "user1@example.com",
+            Email = "user1@example.com",
             Role = "Seller",
             Products = new List<Product>
             {
@@ -56,7 +64,7 @@ public class UserServiceClient : IUserService
                     BuyerId = 2
                 }
             },
-            BuyerHistory = new List<Product>()
+            BuyHistory = new List<Product>()
             {
 
             }
@@ -66,7 +74,7 @@ public class UserServiceClient : IUserService
             id = 2,
             Username = "Olga",
             Password = "password2",
-            Rmail = "user2@example.com",
+            Email = "user2@example.com",
             Role = "Buyer",
             Products = new List<Product>()
             {
@@ -97,7 +105,7 @@ public class UserServiceClient : IUserService
                     BuyerId = null
                 }
             },
-            BuyerHistory = new List<Product>
+            BuyHistory = new List<Product>
             {
                 new Product
                 {
@@ -117,19 +125,31 @@ public class UserServiceClient : IUserService
     };
     
     
-    public Task<User> GetUserLoggedIn()
+    public async Task<User?> GetUserLoggedIn()
     {
-        throw new NotImplementedException();
+        var res = await localStorage.GetItemAsync<User>("user");
+        return res;
     }
 
-    public Task<bool> Login(string username, string password)
+    public async Task<User?> GetUserById(int id)
     {
-        throw new NotImplementedException();
+        return users.FirstOrDefault((x => x.id == id));
     }
 
-    public List<Product> GetUserProducts(int userId)
+    public async Task<bool> Login(string username, string password)
     {
-        throw new NotImplementedException();
+        var res = users.FirstOrDefault(x => x.Username == username && x.Password == password);
+        if (res != null)
+        {
+            localStorage.SetItemAsync("user", new User { id = res.id, Username = res.Username });
+            return true;
+        }
+        return false;
+    }
+
+    public List<Product?> GetUserProducts(int userId)
+    {
+        return users.FirstOrDefault(x => x.id == userId).Products;
     }
 
     public List<Product> GetUserBuyHistory(int userId)

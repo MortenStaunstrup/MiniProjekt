@@ -16,4 +16,12 @@
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="wwwroot\sample-data\Alanson_Headshot.jpg" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Pictures\" />
+    </ItemGroup>
+
 </Project>

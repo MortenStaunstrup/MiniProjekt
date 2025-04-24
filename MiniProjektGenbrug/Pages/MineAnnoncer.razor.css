@@ -1,0 +1,73 @@
+/* Generel liste formatering */
+.listItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 400px;
+    
+    margin-bottom: 25px;
+    
+    border: 5px solid lightgray;
+    border-radius: 10px;
+    
+    background: linear-gradient(to bottom, #095e6a, white);
+}
+
+li{
+    list-style-type: none;
+}
+
+/* Billede og billede div */
+
+.pictureDiv{
+    height: 100%;
+    width: 50%;
+}
+
+img{
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+}
+
+/* Info Div og diverse.. */
+
+.infoDiv{
+    position: relative;
+    width: 50%;
+    height: 100%;
+}
+
+.buttonClass{
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.statusClass{
+    position: absolute;
+    bottom: 10px;
+    right: 100px;
+}
+
+.priceClass{
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+.specsList
+{
+    padding-left: 0;
+    position: absolute;
+    bottom: 60px;
+    left: 10px;
+}
+
+.productNameClass{
+    font-size: 25px;
+}
+
+hr{
+    border: solid 3px black;
+}
