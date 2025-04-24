@@ -9,52 +9,36 @@
 
 <PageTitle>Dine Annoncer</PageTitle>
 
-<h1>Dine Annoncer</h1>
-
 @if (_dineAnnoncer == null)
 {
     <p><i>...loading dine annoncer</i></p>
 }
 else
 {
-    <ul>
+    <button class="Tilføj"><span>Tilføj ny vare</span></button>
+    <div class="Mineannoncer">
         @foreach (var annonce in _dineAnnoncer)
         {
-            <li>
-                <div class="listItem">
-                    <div class="pictureDiv">
-                        <img src="data:image/jpg;base64,@annonce.Picture" alt="Picture of Item"/>
+                <div class="indholdprvare">
+                    <div class="Divpic">
+                        <img src="@annonce.Picture" alt="Picture of Item"/>
                     </div>
-                    <div class="infoDiv">
-                        <span class="productNameClass">@annonce.Productname</span>
-                        <hr/>
-                        <p>@annonce.Description</p>
-                        <ul class="specsList">
-                            <li>Type: @annonce.Category</li>
-                            <li>Farve: @annonce.Color</li>
-                            <li>Størrelse: @annonce.Size</li>
-                        </ul>
-                        <span class="statusClass">Status: @annonce.Status</span>
-                        <span class="priceClass">@annonce.Price</span>
-                        <button class="buttonClass">Rediger</button>
-                        <button @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
+                    <div class="Tekstdiv">
+                        <span>@annonce.Productname</span>
+                        <span>Status: @annonce.Status</span>
+                        <span>@annonce.Category</span>
+                        <span>@annonce.Color</span>
+                        <span>@annonce.Size</span>
+                        <span>@annonce.Description</span>
+                        <span>@annonce.Price,- DKK</span>
+                        <div id="knapper">
+                        <button id="RedigereKnap">Rediger</button>
+                        <button id="SletKnap" @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
+                        </div>
                     </div>
                 </div>
-            </li>
         }
-    </ul>
-    <button class="cssbuttons-io-button">
-        <svg
-            height="24"
-            width="24"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
-        </svg>
-        <span>Tilføj ny Annonce</span>
-    </button>
+        </div>
 }
 
 

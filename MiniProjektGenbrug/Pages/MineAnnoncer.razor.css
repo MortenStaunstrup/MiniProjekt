@@ -1,107 +1,145 @@
-/* Generel liste formatering */
-.listItem {
+#titlebar {
+    position: absolute;
+    left: 50px;
+}
+.Mineannoncer {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+}
+
+.indholdprvare {
+    display: flex;
     align-items: center;
-    height: 400px;
-    
-    margin-bottom: 25px;
-    
-    border: 5px solid lightgray;
+    justify-content: space-between;
+    background-color: #fff;
+    border: 1px solid #ccc;
     border-radius: 10px;
-    
-    background: linear-gradient(to bottom, #095e6a, white);
+    padding: 16px;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-li{
-    list-style-type: none;
-}
-
-/* Billede og billede div */
-
-.pictureDiv{
-    height: 100%;
-    width: 50%;
-}
-
-img{
-    object-fit: contain;
-    height: 100%;
-    width: 100%;
-}
-
-/* Info Div og diverse.. */
-
-.infoDiv{
-    position: relative;
-    width: 50%;
-    height: 100%;
-}
-
-.buttonClass{
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-}
-
-.statusClass{
-    position: absolute;
-    bottom: 10px;
-    right: 100px;
-}
-
-.priceClass{
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-}
-
-.specsList
-{
-    padding-left: 0;
-    position: absolute;
-    bottom: 60px;
-    left: 10px;
-}
-
-.productNameClass{
-    font-size: 25px;
-}
-
-hr{
-    border: solid 3px black;
-}
-
-.cssbuttons-io-button {
+.Divpic {
+    flex: 0 0 100px;
+    height: 75px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #f0f0f0;
     display: flex;
     align-items: center;
-    font-family: inherit;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 16px;
-    padding: 0.7em 1.4em 0.7em 1.1em;
-    color: white;
-    background: #ad5389;
-    background: linear-gradient(
-            0deg,
-            rgba(20, 167, 62, 1) 0%,
-            rgba(102, 247, 113, 1) 100%
-    );
+    justify-content: center;
+}
+
+.Divpic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.Tekstdiv {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.Tekstdiv span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#knapper {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    grid-column: span 2;
+    margin-top: 8px;
+}
+
+#RedigereKnap,
+#SletKnap {
+    padding: 6px 10px;
+    font-size: 13px;
     border: none;
-    box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
-    letter-spacing: 0.05em;
-    border-radius: 20em;
-    float: right;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-.cssbuttons-io-button svg {
-    margin-right: 6px;
+#RedigereKnap {
+    background-color: #1976d2;
+    color: white;
 }
 
-.cssbuttons-io-button:hover {
-    box-shadow: 0 0.5em 1.5em -0.5em #14a73e98;
+#RedigereKnap:hover {
+    background-color: #1259a7;
 }
 
-.cssbuttons-io-button:active {
-    box-shadow: 0 0.3em 1em -0.5em #14a73e98;
+#SletKnap {
+    background-color: #c62828;
+    color: white;
+}
+
+#SletKnap:hover {
+    background-color: #a31c1c;
+}
+.Tilføj {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 500;
+    font-size: 12px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #0090ff;
+    color: ghostwhite;
+}
+
+.Tilføj span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+}
+
+.Tilføj:hover span {
+    color: black;
+}
+
+.Tilføj::before,
+button::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.Tilføj::before {
+    content: "";
+    background: #000;
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+
+.Tilføj:hover::before {
+    transform: translate3d(100%, 0, 0);
+}
+#toplag {
+    display: flex;
 }
