@@ -1,6 +1,6 @@
 namespace API.Repositories.Interfaces;
 
-public class IUserRepository
+public interface IUserRepository
 {
     
 }

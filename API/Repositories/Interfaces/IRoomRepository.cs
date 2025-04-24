@@ -1,6 +1,6 @@
 namespace API.Repositories.Interfaces;
 
-public class IRoomRepository
+public interface IRoomRepository
 {
     
 }

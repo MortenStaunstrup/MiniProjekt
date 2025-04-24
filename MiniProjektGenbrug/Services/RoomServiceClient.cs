@@ -30,6 +30,22 @@ public class RoomServiceClient : IRoomService
             OpeningHour = new DateTime(2023, 10, 1, 7, 30, 0),
             ClosingHour = new DateTime(2023, 10, 1, 19, 0, 0),
             Staffing = 1
+        },
+        new Room
+        {
+            id = 4,
+            Name = "Common Room",
+            OpeningHour = new DateTime(2023, 10, 1, 7, 30, 0),
+            ClosingHour = new DateTime(2023, 10, 1, 19, 0, 0),
+            Staffing = 1
+        },
+        new Room
+        {
+            id = 5,
+            Name = "Meeting Room Z",
+            OpeningHour = new DateTime(2023, 10, 1, 7, 30, 0),
+            ClosingHour = new DateTime(2023, 10, 1, 19, 0, 0),
+            Staffing = 1
         }
     };
     public List<Room> GetRooms()
