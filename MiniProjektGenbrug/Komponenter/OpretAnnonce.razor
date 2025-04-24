@@ -1,4 +1,4 @@
-@page "/opretAnnonce"
+@page "/opretannoncer"
 @inject NavigationManager navMan
 @using MiniProjektGenbrug.Services.Interfaces
 @inject IProductService ProductService
@@ -105,7 +105,6 @@
         };
 
         ProductService.AddProduct(newProduct);
-
         Console.WriteLine("Annonce tilføjet:");
         Console.WriteLine($"{newAd.Name} - {newAd.Price} - {newAd.Category}");
 

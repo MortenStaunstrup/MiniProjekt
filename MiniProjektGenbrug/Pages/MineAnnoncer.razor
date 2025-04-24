@@ -15,41 +15,128 @@
 }
 else
 {
-    <button class="Tilføj"><span>Tilføj ny vare</span></button>
+    <button class="Tilføj" @onclick="() => showModal = true"><span>Tilføj ny vare</span></button>
+
     <div class="Mineannoncer">
         @foreach (var annonce in _dineAnnoncer)
         {
-                <div class="indholdprvare">
-                    <div class="Divpic">
-                        <img src="@annonce.Picture" alt="Picture of Item"/>
-                    </div>
-                    <div class="Tekstdiv">
-                        <span>@annonce.Productname</span>
-                        <span>Status: @annonce.Status</span>
-                        <span>@annonce.Category</span>
-                        <span>@annonce.Color</span>
-                        <span>@annonce.Size</span>
-                        <span>@annonce.Description</span>
-                        <span>@annonce.Price,- DKK</span>
-                        <div id="knapper">
+            <div class="indholdprvare">
+                <div class="Divpic">
+                    <img src="@annonce.Picture" alt="Picture of Item" />
+                </div>
+                <div class="Tekstdiv">
+                    <span>@annonce.Productname</span>
+                    <span>Status: @annonce.Status</span>
+                    <span>@annonce.Category</span>
+                    <span>@annonce.Color</span>
+                    <span>@annonce.Size</span>
+                    <span>@annonce.Description</span>
+                    <span>@annonce.Price,- DKK</span>
+                    <div id="knapper">
                         <button id="RedigereKnap">Rediger</button>
                         <button id="SletKnap" @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
-                        </div>
                     </div>
                 </div>
+            </div>
         }
-        </div>
+    </div>
 }
 
+@if (showModal)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <button class="close-button" @onclick="CloseModal">X</button>
+
+            <h3>Tilføj ny annonce</h3>
+
+            <EditForm Model="newAd" OnValidSubmit="AddAd">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-grid">
+                    <div class="form-item">
+                        <label>Pris:</label>
+                        <InputText placeholder="Indsæt pris..." @bind-Value="newAd.Price" />
+                    </div>
+
+                    <div class="form-item">
+                        <label>Varenavn:</label>
+                        <InputText placeholder="Varenavn..." @bind-Value="newAd.Name" />
+                    </div>
+
+                    <div class="form-item">
+                        <label>Lokale:</label>
+                        <InputSelect @bind-Value="newAd.Room">
+                            <option disabled selected>Vælg lokale</option>
+                            @foreach (var r in Room)
+                            {
+                                <option>@r</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-item">
+                        <label>Kategori:</label>
+                        <InputSelect @bind-Value="newAd.Category">
+                            <option disabled selected>Vælg kategori</option>
+                            @foreach (var c in Categories)
+                            {
+                                <option>@c</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-item">
+                        <label>Farve:</label>
+                        <InputText @bind-Value="newAd.Color" />
+                    </div>
+
+                    <div class="form-item">
+                        <label>Størrelse:</label>
+                        <InputSelect @bind-Value="newAd.Size">
+                            <option disabled selected>Vælg størrelse</option>
+                            @foreach (var s in Sizes)
+                            {
+                                <option>@s</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-item full-width">
+                        <label>Beskrivelse:</label>
+                        <InputTextArea @bind-Value="newAd.Description" />
+                    </div>
+
+                    <div class="form-item">
+                        <label>Billede:</label>
+                        <InputFile OnChange="HandleImageUpload" />
+                    </div>
+
+                    <div class="form-item">
+                        <button type="submit">Tilføj annonce</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
 
 @code {
-    
     User? currentUser;
     List<Product>? _dineAnnoncer;
+    bool showModal = false;
+
+    private AdModel newAd = new();
+
+    private List<string> Room = new() { "A101", "A102", "A103", "A104", "A105", "A106", "A107", "A108", "A109", "A110" };
+    private List<string> Categories = new() { "Bukser", "T-shirt", "Sko", "Sweater", "Nederdel", "Kjole", "Jakke" };
+    private List<string> ClothingSizes = new() { "XS", "S", "M", "L", "XL", "XXL", "XXXL" };
+    private List<string> ShoeSizes = new() { "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46" };
+    private List<string> Sizes => newAd.Category == "Sko" ? ShoeSizes : ClothingSizes;
 
     protected override async Task OnInitializedAsync()
     {
-        // Test kode
         var theUser = await userService.GetUserById(1);
         var theDataSavedInLocalstorage = new User()
         {
@@ -57,27 +144,65 @@ else
             Username = theUser.Username,
             Role = theUser.Role
         };
-        await localStorage.SetItemAsync("user",theDataSavedInLocalstorage);
-        //
+        await localStorage.SetItemAsync("user", theDataSavedInLocalstorage);
+
         currentUser = await userService.GetUserLoggedIn();
         if (currentUser == null)
         {
             navMan.NavigateTo("login");
         }
-        
-        // Test kode, giver alle produkter ikke kun brugers !!!!!!
+
         _dineAnnoncer = await productService.GetAllProducts();
     }
 
     private void DeleteAnnonce(int id)
     {
-        //--------------------------
-        // Kode til at slette i bruger collection
-        //--------------------------
-        
         productService.DeleteProductById(id);
         _dineAnnoncer.RemoveAll(x => x.id == id);
         StateHasChanged();
     }
 
+    private void CloseModal() => showModal = false;
+
+    private async Task AddAd()
+    {
+        var newProduct = new Product
+        {
+            Price = Convert.ToDouble(newAd.Price),
+            Productname = newAd.Name,
+            Category = newAd.Category,
+            Color = newAd.Color,
+            Size = newAd.Size,
+            Description = newAd.Description,
+            Status = "Available",
+            BuyerId = null,
+            Picture = newAd.Picture
+        };
+
+         productService.AddProduct(newProduct);
+        showModal = false;
+        _dineAnnoncer = await productService.GetAllProducts();
+    }
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+        
+            newAd.Picture = "/images/" + file.Name;
+        }
+    }
+
+    public class AdModel
+    {
+        public string? Price { get; set; }
+        public string? Name { get; set; }
+        public string? Room { get; set; }
+        public string? Category { get; set; }
+        public string? Color { get; set; }
+        public string? Size { get; set; }
+        public string? Description { get; set; }
+        public string? Picture { get; set; }
+    }
 }
