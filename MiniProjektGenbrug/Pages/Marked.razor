@@ -36,7 +36,7 @@ else
                         <span>@article.Productname</span>
                         <span>@article.Size - @article.Color</span>
                         <span> Status: @article.Status</span>
-                        <span>@(roomNames.TryGetValue(article.id, out var roomName) ? roomName : "Loading...")</span>
+                        <span>@article.RoomName</span>
                         <span> @article.Price,- DKK</span>
                  
                     </div>
@@ -51,22 +51,11 @@ else
 
     private List<Product> _products;
     private User? currentUser;
-    private Dictionary<int, string> roomNames = new Dictionary<int, string>();
 
     protected override async Task OnInitializedAsync()
     {
-
         currentUser = await localstorage.GetItemAsync<User>("user");
         _products = await _ProductService.GetAllProducts();
-        
-        foreach (var article in _products)
-        {
-            if (article.Status != "Gennemført")
-            {
-                roomNames[article.id] = await GetRoomName(article.RoomId);
-            }
-        }
-        
     }
     /*
         if (currentUser == null)
@@ -87,10 +76,5 @@ else
             _products = await _ProductService.GetAllProducts(); // Opdatere tøjet
         }
     }
-
-    private async Task<string> GetRoomName(int id)
-    {
-        Room room = await IRoomService.GetRoomById(id);
-        return room.Name;
-    }
+    
 }
