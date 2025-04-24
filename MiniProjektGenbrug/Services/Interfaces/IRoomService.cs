@@ -4,7 +4,10 @@ namespace MiniProjektGenbrug.Services.Interfaces;
 
 public interface IRoomService
 {
-    List<Room> GetRooms();
-    Room GetRoomById(int id);
+    Task<List<Room>> GetRooms();
+    Task<Room>GetRoomById(int id);
+    void AddRoom(Room room);
+    void UpdateRoomById(int id, Room room);
+    void DeleteRoomById(int id);
     
 }

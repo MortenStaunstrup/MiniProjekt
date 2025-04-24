@@ -28,7 +28,7 @@ else
                     <div class="infoDiv">
                         <span class="productNameClass">@annonce.Productname</span>
                         <hr/>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque nec faucibus mi. Phasellus et euismod orci. Proin varius, felis id faucibus semper, urna nulla pharetra diam, vitae efficitur ante ligula id velit.</p>
+                        <p>@annonce.Description</p>
                         <ul class="specsList">
                             <li>Type: @annonce.Category</li>
                             <li>Farve: @annonce.Color</li>
@@ -42,7 +42,18 @@ else
             </li>
         }
     </ul>
-    <button>Tilføj</button>
+    <button class="cssbuttons-io-button">
+        <svg
+            height="24"
+            width="24"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
+        </svg>
+        <span>Tilføj ny Annonce</span>
+    </button>
 }
 
 
