@@ -15,7 +15,7 @@ public class ProductServiceServer : IProductService
     }
     
     
-    public async Task<List<Product>> GetProductsById()
+    public async Task<List<Product>> GetAllProducts()
     {
         return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/getall");
     }
