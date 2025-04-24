@@ -26,6 +26,7 @@ public class Product
     public string Status { get; set; }
     // Liste af alle bruger Id'er som har anmodet om at købe produktet
     public int? BuyerId { get; set; }
+    // FK til Rooms
     [Required]
-    public int RoomId { get; set; }
+    public string RoomName { get; set; }
 }
