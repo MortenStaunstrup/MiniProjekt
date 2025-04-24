@@ -16,29 +16,35 @@
 }
 else
 {
-    <ul>
+    <div class="input-group mb-3">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon1">Søg</button>
+        <input type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+    </div>
+    
+    <div class="altindhold">
+        
         @foreach (var article in _products)
+            // @onclick="() => showModal = true" --!> til indholdprvare
         {
             @if (article.Status != "Gennemført")
             {
-                <li>
-                    <div class="altindhold">
-                        <div class="textdiv">
-                            @article.id - @article.Description (Størrelse: @article.Size)
-                            <span> @article.Price,- DKK</span>
-                            <span> Status: @article.Status</span>
-                            <span>@IRoomService.GetRoomById(@article.RoomId).Name</span>
-                        </div>
-                        <div class="DivPic">
-                            @article.Picture
-                        </div>
-                  
-                        <button @onclick="() => ReturnProduct(article.id)">Anmod</button>
-                        </div>
-                </li>
+                <div class="indholdprvare">
+                    <div class="DivPic">
+                        <img src="@article.Picture" alt="Billede af vare">
+                    </div>
+                    <div class="tekstdiv">
+                        <span>@article.Productname</span>
+                        <span>@article.Size - @article.Color</span>
+                        <span> Status: @article.Status</span>
+                        <span>@IRoomService.GetRoomById(@article.RoomId).Name</span>
+                        <span> @article.Price,- DKK</span>
+                 
+                    </div>
+                </div>
             }
         }
-    </ul>
+
+    </div>
 }
 
 @code {
@@ -47,11 +53,14 @@ else
     private User? currentUser;
 
     private Dictionary<int, Room> productRoomMap = new();
-/* midlertidligt udkommenteret, spørger Umut
+
     protected override async Task OnInitializedAsync()
     {
-        
+
         currentUser = await localstorage.GetItemAsync<User>("user");
+        _products = await _ProductService.GetProductsById();
+    }
+    /*
         if (currentUser == null)
         {
             navMan.NavigateTo("login");
@@ -62,6 +71,7 @@ else
         }
     }
 */
+
     private async Task ReturnProduct(int id)
     {
         if (currentUser != null)

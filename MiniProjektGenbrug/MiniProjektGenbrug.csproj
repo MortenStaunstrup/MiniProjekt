@@ -20,8 +20,4 @@
       <None Include="wwwroot\sample-data\Alanson_Headshot.jpg" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Pictures\" />
-    </ItemGroup>
-
 </Project>
