@@ -57,5 +57,6 @@ public class ProductMongoDBRepository : IProductRepository
     {
         var filter = Builders<Product>.Filter.Eq(x => x.id, id);
         await collection.DeleteOneAsync(filter);
+        Console.WriteLine($"Deleting Product: {id}");
     }
 }

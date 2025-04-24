@@ -19,6 +19,7 @@ public class ProductController : ControllerBase
     [Route("getall")]
     public async Task<List<Product>> GetProducts()
     {
+        Console.WriteLine("Getting All Products");
         return await _productRepository.GetProducts();
     }
 
@@ -38,14 +39,14 @@ public class ProductController : ControllerBase
 
     [HttpPut]
     [Route("update/{id:int}")]
-    void UpdateProductById(int id, Product product)
+    public void UpdateProductById(int id, Product product)
     {
         _productRepository.UpdateProductById(id, product);
     }
 
     [HttpDelete]
     [Route("delete/{id:int}")]
-    void DeleteProductById(int id)
+    public void DeleteProductById(int id)
     {
         _productRepository.DeleteProductById(id);
     }
