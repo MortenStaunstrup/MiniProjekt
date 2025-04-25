@@ -1,63 +1,45 @@
-.burger {
-    position: relative;
-    width: 40px;
-    height: 30px;
-    background: transparent;
+#checkud {
+    width: 48px;
+    height: 60px;
+    background: none;
+    /*border: 1px solid #ccc; Kant farve til str justering*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    padding-top: 20px;
+    margin: auto;
+    position: fixed;
+    left: 93%;
+    top: 25px;
     cursor: pointer;
-    display: block;
-    top: 22px;
-    left: 940px;
 }
 
-.burger input {
-    display: none;
-}
-
-.burger span {
-    display: block;
+#checkud i {
+    font-size: 36px;
     position: absolute;
-    height: 4px;
-    width: 100%;
-    background: black;
-    border-radius: 9px;
-    opacity: 1;
-    left: 0;
-    transform: rotate(0deg);
-    transition: .25s ease-in-out;
-}
-
-.burger span:nth-of-type(1) {
     top: 0px;
-    transform-origin: left center;
+    z-index: 1000;
 }
 
-.burger span:nth-of-type(2) {
-    top: 50%;
-    transform: translateY(-50%);
-    transform-origin: left center;
+#indkøbstal {
+    margin-top: 10px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: cornflowerblue;
+    border-radius: 50%;
+    z-index: 1001;
 }
 
-.burger span:nth-of-type(3) {
-    top: 100%;
-    transform-origin: left center;
-    transform: translateY(-100%);
-}
-
-.burger input:checked ~ span:nth-of-type(1) {
-    transform: rotate(45deg);
-    top: 0px;
-    left: 5px;
-}
-
-.burger input:checked ~ span:nth-of-type(2) {
-    width: 0%;
-    opacity: 0;
-}
-
-.burger input:checked ~ span:nth-of-type(3) {
-    transform: rotate(-45deg);
-    top: 28px;
-    left: 5px;
+#tal {
+    margin: 0;
+    font-size: 14px;
+    text-align: center;
+    z-index: 1002;
+    color: black;
 }
 #main {
     background: whitesmoke;
@@ -137,5 +119,91 @@ main {
     .top-row, article {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
+    }
+}
+@media (min-width: 641px) {
+    .cart-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 100vh;
+        background-color: #fff;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+        padding: 1.5rem;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        color: #888;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .close-button:hover {
+        color: #111;
+    }
+
+    .cart-panel h4 {
+        margin: 0;
+        padding: 1rem 0 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .buttons-container {
+        display: flex;
+        width: 100%;
+        margin-top: auto;
+        gap: 10px;
+    }
+
+    .buttons-container button {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .buttons-container button:hover {
+        transform: scale(1.05);
+    }
+
+    .checkout-button {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .checkout-button:hover {
+        background-color: #555;
+    }
+
+    .buttons-container button:not(.checkout-button) {
+        background-color: #f1f1f1;
+        color: #333;
+        border: none;
+    }
+
+    .buttons-container button:not(.checkout-button):hover {
+        background-color: #e1e1e1;
     }
 }

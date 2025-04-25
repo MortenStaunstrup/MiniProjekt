@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using MiniProjektGenbrug.Services.Interfaces
+@inject IProductService ProductService
+@using Core
 
 <div class="page">
     <div class="sidebar">
@@ -6,15 +9,68 @@
     </div>
 
     <main id="main">
-        <label class="burger" for="burger">
-            <input type="checkbox" id="burger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </label>
+        <div id="checkud" @onclick="ToggleCartPanel">
+            <i class="fa fa-shopping-cart" style="font-size:36px"></i>
+            <div id="indkøbstal"><p id="tal">@cartItems.Count</p></div>
+            </div>
+        @if (show == true)
+        {
+            <div class="cart-panel">
+                <button class="close-button" @onclick="ToggleCartPanel">×</button>
+                <h4>Min Anmodningskurv</h4>
+
+                @if (cartItems.Any())
+                {
+                    <ul>
+                        @foreach (var product in cartItems)
+                        {
+                            <li>@product.Productname - @product.Price.ToString("C")</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>Kurven er tom</p>
+                }
+
+                <div class="buttons-container">
+                    <button @onclick="ToggleEditMode">Rediger</button>
+                    <button class="checkout-button">Gå til betaling</button>
+                </div>
+            </div>
+        }
 
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    private bool show = false;
+    private bool isEditing = false;
+
+    private List<Product> cartItems = new()
+    {
+        new Product { Productname = "Eksempel", Price = 99.99 }
+    };
+
+    private void ToggleCartPanel()
+    {
+        if (show == true)
+        {
+            show = false;
+        }
+        else
+        {
+            show = true;
+        }
+        Console.WriteLine($"Cartpanel vises: {show}");
+    }
+
+    private void ToggleEditMode()
+    {
+        isEditing = !isEditing;
+        StateHasChanged();
+    }
+}
