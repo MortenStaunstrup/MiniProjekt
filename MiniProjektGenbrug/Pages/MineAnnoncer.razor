@@ -6,6 +6,7 @@
 @inject NavigationManager navMan
 @inject ILocalStorageService localStorage
 @inject IProductService productService
+@inject IRoomService roomService
 
 <PageTitle>Dine Annoncer</PageTitle>
 
@@ -133,7 +134,7 @@ else
 
     private byte[] pictureBytes;
     
-    private List<string> Room = new() { "A101", "A102", "A103", "A104", "A105", "A106", "A107", "A108", "A109", "A110" };
+    private List<string> Room = new List<string>();
     private List<string> Categories = new() { "Bukser", "T-shirt", "Sko", "Sweater", "Nederdel", "Kjole", "Jakke" };
 
     private List<string> ClothingSizes = new() { "XS", "S", "M", "L", "XL", "XXL", "XXXL"};
@@ -167,6 +168,12 @@ else
         {
             if (p.Picture != null)
                 p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+        }
+
+        var rooms = await roomService.GetRooms();
+        foreach (var r in rooms)
+        {
+            Room.Add(r.Name);
         }
     }
 

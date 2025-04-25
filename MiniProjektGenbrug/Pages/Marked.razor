@@ -10,20 +10,20 @@
 <PageTitle>Marked</PageTitle>
 
 <h1>Marked</h1>
-@if (_products == null)
+@if (_filteredProducts == null)
 {
     <p>Loading your marked...</p>
 }
 else
 {
     <div class="input-group mb-3">
-        <button class="btn btn-outline-secondary" type="button" id="button-addon1">Søg</button>
-        <input type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon1" @onclick="Search">Søg</button>
+        <InputText @bind-Value="@SearchText" type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1"></InputText>
     </div>
     
     <div class="altindhold">
         
-        @foreach (var article in _products)
+        @foreach (var article in _filteredProducts)
             // @onclick="() => showModal = true" --!> til indholdprvare
         {
             @if (article.Status != "Gennemført")
@@ -49,13 +49,17 @@ else
 
 @code {
 
+    private string SearchText;
+    
     private List<Product> _products;
+    private List<Product> _filteredProducts;
     private User? currentUser;
 
     protected override async Task OnInitializedAsync()
     {
         currentUser = await localstorage.GetItemAsync<User>("user");
         _products = await _ProductService.GetAllProducts();
+        _filteredProducts = _products;
 
         foreach (var p in _products)
         {
@@ -63,6 +67,22 @@ else
                 p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
         }
         
+    }
+
+    private void Search()
+    {
+        if (SearchText == "")
+        {
+            _filteredProducts = _products;
+            StateHasChanged();
+        }
+        else
+        {
+            _filteredProducts = _products.FindAll(x => x.Productname.ToLower().Contains(SearchText.ToLower()));
+            _filteredProducts.AddRange(_products.FindAll(x => x.Category.ToLower().Contains(SearchText.ToLower())));
+            _filteredProducts.AddRange(_products.FindAll(x => x.Color.ToLower().Contains(SearchText.ToLower())));
+            StateHasChanged();
+        }
     }
     
     /*
