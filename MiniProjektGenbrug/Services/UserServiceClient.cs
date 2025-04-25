@@ -32,7 +32,7 @@ public class UserServiceClient : IUserService
                     Description = "Casual cotton t-shirt",
                     Category = "Clothing",
                     Color = "Blue",
-                    Picture = "tshirt_blue.jpg",
+                    Picture = null,
                     Size = "M",
                     Status = "Available",
                     BuyerId = null
@@ -45,7 +45,7 @@ public class UserServiceClient : IUserService
                     Description = "Stylish denim jeans",
                     Category = "Clothing",
                     Color = "Black",
-                    Picture = "jeans_black.jpg",
+                    Picture = null,
                     Size = "L",
                     Status = "Available",
                     BuyerId = null
@@ -58,7 +58,7 @@ public class UserServiceClient : IUserService
                     Description = "Latest model with high-end features",
                     Category = "Electronics",
                     Color = "Silver",
-                    Picture = "smartphone_silver.jpg",
+                    Picture = null,
                     Size = "N/A",
                     Status = "Sold",
                     BuyerId = 2
@@ -86,7 +86,7 @@ public class UserServiceClient : IUserService
                     Description = "Comfortable and durable running shoes",
                     Category = "Footwear",
                     Color = "Red",
-                    Picture = "shoes_red.jpg",
+                    Picture = null,
                     Size = "10",
                     Status = "Available",
                     BuyerId = null
@@ -99,7 +99,7 @@ public class UserServiceClient : IUserService
                     Description = "Lightweight laptop with powerful performance",
                     Category = "Electronics",
                     Color = "Gray",
-                    Picture = "laptop_gray.jpg",
+                    Picture = null,
                     Size = "N/A",
                     Status = "Pending",
                     BuyerId = null
@@ -115,7 +115,7 @@ public class UserServiceClient : IUserService
                     Description = "Latest model with high-end features",
                     Category = "Electronics",
                     Color = "Silver",
-                    Picture = "smartphone_silver.jpg",
+                    Picture = null,
                     Size = "N/A",
                     Status = "Sold",
                     BuyerId = 2

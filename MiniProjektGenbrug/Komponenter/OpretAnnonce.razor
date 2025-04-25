@@ -1,31 +1,32 @@
 @page "/opretannoncer"
 @inject NavigationManager navMan
+@using System.Buffers.Text
 @using MiniProjektGenbrug.Services.Interfaces
 @inject IProductService ProductService
 @using Core
 
 <h3>Tilføj ny annonce</h3>
 
-@if (newAd != null)
+@if (model != null)
 {
-    <EditForm Model="newAd" OnValidSubmit="AddAd">
+    <EditForm EditContext="EditContext" OnSubmit="AddAd">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="form-grid">
             <div class="form-item">
                 <label>Pris:</label>
-                <InputText placeholder="Indsat pris.." @bind-Value="newAd.Price" />
+                <InputNumber TValue="double" placeholder="Indsat pris.." @bind-Value="model.Price" />
             </div>
 
             <div class="form-item">
                 <label>Varenavn:</label>
-                <InputText placeholder="Varenavn.." @bind-Value="newAd.Name" />
+                <InputText placeholder="Varenavn.." @bind-Value="model.Productname" />
             </div>
 
             <div class="form-item">
                 <label>Lokale:</label>
-                <InputSelect @bind-Value="newAd.Room">
+                <InputSelect @bind-Value="model.RoomName">
                     <option disabled selected>Vælg lokale</option>
                     @foreach (var r in Room)
                     {
@@ -36,7 +37,7 @@
 
             <div class="form-item">
                 <label>Kategori:</label>
-                <InputSelect @bind-Value="newAd.Category">
+                <InputSelect @bind-Value="model.Category">
                     <option disabled selected>Vælg kategori</option>
                     @foreach (var c in Categories)
                     {
@@ -47,12 +48,12 @@
 
             <div class="form-item">
                 <label>Farve:</label>
-                <InputText @bind-Value="newAd.Color" />
+                <InputText @bind-Value="model.Color" />
             </div>
 
             <div class="form-item">
                 <label>Størrelse:</label>
-                <InputSelect @bind-Value="newAd.Size">
+                <InputSelect @bind-Value="model.Size">
                     <option disabled selected>Vælg størrelse</option>
                     @foreach (var s in Sizes)
                     {
@@ -63,12 +64,12 @@
 
             <div class="form-item full-width">
                 <label>Beskrivelse:</label>
-                <InputTextArea @bind-Value="newAd.Description" />
+                <InputTextArea @bind-Value="model.Description" />
             </div>
 
             <div class="form-item">
                 <label>Billede:</label>
-                <InputFile OnChange="HandleImageUpload" />
+                <InputFile OnChange="HandleImageUpload" accept=".jpg,.jpeg,.png" />
             </div>
 
             <div class="form-item">
@@ -79,36 +80,41 @@
 }
 
 @code {
-    private AdModel newAd = new();
+    private Product model;
+    private EditContext EditContext;
 
+    private byte[] pictureBytes;
+    
     private List<string> Room = new() { "A101", "A102", "A103", "A104", "A105", "A106", "A107", "A108", "A109", "A110" };
     private List<string> Categories = new() { "Bukser", "T-shirt", "Sko", "Sweater", "Nederdel", "Kjole", "Jakke" };
 
     private List<string> ClothingSizes = new() { "XS", "S", "M", "L", "XL", "XXL", "XXXL"};
     private List<string> ShoeSizes = new() { "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46" };
 
-    private List<string> Sizes => newAd.Category == "Sko" ? ShoeSizes : ClothingSizes;
+    private List<string> Sizes => model.Category == "Sko" ? ShoeSizes : ClothingSizes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = new Product();
+        EditContext = new EditContext(model);
+    }
 
     private async Task AddAd()
     {
-        var newProduct = new Product
+        model.Status = "Available";
+        model.BuyerId = null;
+        if (EditContext.Validate())
         {
-            Price = Convert.ToDouble(newAd.Price),
-            Productname = newAd.Name,
-            Category = newAd.Category,
-            Color = newAd.Color,
-            Size = newAd.Size,
-            Description = newAd.Description,
-            Status = "Available",
-            BuyerId = null,
-            Picture = newAd.Picture
-        };
+            ProductService.AddProduct(model);
+            Console.WriteLine("Annonce tilføjet:");
+            Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
 
-        ProductService.AddProduct(newProduct);
-        Console.WriteLine("Annonce tilføjet:");
-        Console.WriteLine($"{newAd.Name} - {newAd.Price} - {newAd.Category}");
-
-        navMan.NavigateTo("/alleannoncer");
+            navMan.NavigateTo("/alleannoncer");
+        }
+        else
+        {
+            Console.WriteLine("Annonce fejlet");
+        }
     }
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
@@ -116,21 +122,11 @@
         var file = e.File;
         if (file != null)
         {
-            var filePath = "/images/" + file.Name;
-            newAd.Picture = filePath;
-            Console.WriteLine("Billede valgt: " + file.Name);
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            pictureBytes = memoryStream.ToArray();
+            model.Picture = Convert.ToBase64String(pictureBytes);
         }
     }
-
-    public class AdModel
-    {
-        public string? Price { get; set; }
-        public string? Name { get; set; }
-        public string? Room { get; set; }
-        public string? Category { get; set; }
-        public string? Color { get; set; }
-        public string? Size { get; set; }
-        public string? Description { get; set; }
-        public string? Picture { get; set; }
-    }
+    
 }

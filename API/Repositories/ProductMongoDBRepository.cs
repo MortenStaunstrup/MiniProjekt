@@ -1,6 +1,8 @@
+using System.Buffers.Text;
 using API.Repositories.Interfaces;
 using Core;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 
 namespace API.Repositories;
 
@@ -10,24 +12,40 @@ public class ProductMongoDBRepository : IProductRepository
     private MongoClient _client;
     private IMongoDatabase database;
     private IMongoCollection<Product> collection;
+    private GridFSBucket bucket;
 
     public ProductMongoDBRepository()
     {
         _client = new MongoClient(connectionString);
         database = _client.GetDatabase("Genbrug");
         collection = database.GetCollection<Product>("Products");
+        bucket = new GridFSBucket(database, new GridFSBucketOptions{ BucketName = "Billeder" });
     }
 
     public async Task<List<Product>> GetProducts()
     {
         var filter = Builders<Product>.Filter.Empty;
-        return await collection.Aggregate().Match(filter).ToListAsync();
+        var result = await collection.Aggregate().Match(filter).ToListAsync();
+        if (result.Any())
+        {
+            foreach (var p in result)
+            {
+                if(p.PictureId != null)
+                    p.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(p.PictureId));
+            }
+            return result;
+        }
+        return result;
     }
 
-    public async Task<Product> GetProductById(int id)
+    public async Task<Product?> GetProductById(int id)
     {
         var filter = Builders<Product>.Filter.Eq(x => x.id, id);
-        return await collection.Aggregate().Match(filter).SingleOrDefaultAsync();
+        var result = await collection.Aggregate().Match(filter).SingleOrDefaultAsync();
+        if (result != null)
+            if(result.PictureId != null)
+                result.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(result.PictureId));
+        return result;
     }
 
     public async Task<int> GetMaxProductId()
@@ -43,8 +61,15 @@ public class ProductMongoDBRepository : IProductRepository
     
     public async void AddProduct(Product product)
     {
-        product.id = await GetMaxProductId();
+        product.id = await GetMaxProductId() + 1;
+        if (product.Picture != null)
+        {
+            var picId = await bucket.UploadFromBytesAsync(product.Productname,Convert.FromBase64String(product.Picture));
+            product.PictureId = picId;
+            product.Picture = null;
+        }
         await collection.InsertOneAsync(product);
+        Console.WriteLine("Adding product to DB");
     }
 
     public async void UpdateProductById(int id, Product product)

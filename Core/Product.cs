@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Core;
@@ -11,7 +12,7 @@ public class Product
     [Range(1, 1000000)]
     public double Price { get; set; }
     [Required]
-    [Length(3, 20)]
+    [Length(3, 40)]
     public string Productname { get; set; }
     public string? Description { get; set; }
     [Required]
@@ -20,6 +21,8 @@ public class Product
     [Length(1, 20)]
     public string Color { get; set; }
     public string? Picture { get; set; }
+    public ObjectId? PictureId { get; set; }
+    public string? PictureSrc { get; set; }
     [Required]
     public string Size { get; set; }
     [Required]

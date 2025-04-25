@@ -34,6 +34,7 @@ public class ProductController : ControllerBase
     [Route("add")]
     public void AddProduct(Product product)
     {
+        Console.WriteLine("Product in Controller");
         _productRepository.AddProduct(product);
     }
 
