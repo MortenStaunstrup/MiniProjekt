@@ -74,8 +74,24 @@ public class ProductMongoDBRepository : IProductRepository
 
     public async void UpdateProductById(int id, Product product)
     {
+        var productWId = await GetProductById(id);
+        productWId.Productname = product.Productname;
+        productWId.Category = product.Category;
+        productWId.Price = product.Price;
+        productWId.Size = product.Size;
+        productWId.Color = product.Color;
+        productWId.Description = product.Description;
+        productWId.RoomName = product.RoomName;
+        productWId.Status = product.Status;
+        productWId.BuyerId = product.BuyerId;
+        if (product.Picture != null)
+        {
+            var picId = await bucket.UploadFromBytesAsync(product.Productname,Convert.FromBase64String(product.Picture));
+            productWId.PictureId = picId;
+            productWId.Picture = null;
+        }
         var filter = Builders<Product>.Filter.Eq(x => x.id, id);
-        await collection.ReplaceOneAsync(filter, product);
+        await collection.ReplaceOneAsync(filter, productWId);
     }
 
     public async void DeleteProductById(int id)

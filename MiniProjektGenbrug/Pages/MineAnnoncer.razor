@@ -33,7 +33,7 @@ else
                     <span>@annonce.Description</span>
                     <span>@annonce.Price,- DKK</span>
                     <div id="knapper">
-                        <button id="RedigereKnap">Rediger</button>
+                        <button id="RedigereKnap" @onclick="() => UpdateAnnonce(annonce)">Rediger</button>
                         <button id="SletKnap" @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
                     </div>
                 </div>
@@ -127,6 +127,7 @@ else
     List<Product>? _dineAnnoncer;
     bool showModal = false;
 
+    bool editing = false;
     private Product model;
     private EditContext EditContext;
 
@@ -175,6 +176,14 @@ else
         _dineAnnoncer.RemoveAll(x => x.id == id);
         StateHasChanged();
     }
+    
+    private void UpdateAnnonce(Product product)
+    {
+        editing = true;
+        showModal = true;
+        model = product;
+        EditContext = new EditContext(model);
+    }
 
     private void CloseModal() => showModal = false;
 
@@ -184,11 +193,21 @@ else
         model.BuyerId = null;
         if (EditContext.Validate())
         {
-            productService.AddProduct(model);
-            Console.WriteLine("Annonce tilføjet:");
-            Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
+            if (!editing)
+            {
+                productService.AddProduct(model);
+                Console.WriteLine("Annonce tilføjet:");
+                Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
 
-            navMan.NavigateTo("/alleannoncer");
+                navMan.NavigateTo("/alleannoncer");
+            }
+            else
+            {
+                productService.UpdateProductById(model.id, model);
+                Console.WriteLine("Product update");
+                editing = false;
+                CloseModal();
+            }
         }
         else
         {
