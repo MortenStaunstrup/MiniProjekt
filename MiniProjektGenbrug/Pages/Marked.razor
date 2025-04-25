@@ -30,7 +30,7 @@ else
             {
                 <div class="indholdprvare">
                     <div class="DivPic">
-                        <img src="@article.Picture" alt="Billede af vare">
+                        <img src="@article.PictureSrc" alt="Billede af vare">
                     </div>
                     <div class="tekstdiv">
                         <span>@article.Productname</span>
@@ -56,6 +56,13 @@ else
     {
         currentUser = await localstorage.GetItemAsync<User>("user");
         _products = await _ProductService.GetAllProducts();
+
+        foreach (var p in _products)
+        {
+            if (p.Picture != null)
+                p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+        }
+        
     }
     
     /*
