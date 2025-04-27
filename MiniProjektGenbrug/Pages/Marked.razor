@@ -30,7 +30,7 @@ else
             {
                 <div class="indholdprvare">
                     <div class="DivPic">
-                        <img src="@article.PictureSrc" alt="Billede af vare">
+                        <img src="@(article.PictureSrc != null ? article.PictureSrc : "sample-data/noImgAvailable.png")" alt="Billede af vare">
                     </div>
                     <div class="tekstdiv">
                         <span>@article.Productname</span>

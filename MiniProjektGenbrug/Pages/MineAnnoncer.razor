@@ -23,7 +23,7 @@ else
         {
             <div class="indholdprvare">
                 <div class="Divpic">
-                    <img src="@annonce.PictureSrc" alt="Picture of Item" />
+                    <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item" />
                 </div>
                 <div class="Tekstdiv">
                     <span>@annonce.Productname</span>
@@ -164,12 +164,15 @@ else
         }
         // Ændre kode til kun at vise produkter fra brugeren !!!
         _dineAnnoncer = await productService.GetAllProducts();
+        
+        // Indsæt hvert billede for hvert product
         foreach (var p in _dineAnnoncer)
         {
             if (p.Picture != null)
                 p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
         }
 
+        // Hent alle rum fra databasen og tilføj navnet til listen af Rooms der kan vælges når man laver sin annonce
         var rooms = await roomService.GetRooms();
         foreach (var r in rooms)
         {
@@ -192,7 +195,11 @@ else
         EditContext = new EditContext(model);
     }
 
-    private void CloseModal() => showModal = false;
+    private void CloseModal()
+    {
+        showModal = false;
+        editing = false;
+    }
 
     private async Task AddAd()
     {
