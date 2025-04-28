@@ -212,6 +212,17 @@ else
         showModal = false;
     }
 
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            pictureBytes = memoryStream.ToArray();
+            model.Picture = Convert.ToBase64String(pictureBytes);
+        }
+    }
     private async Task AddAd()
     {
         model.Status = "Available";
@@ -240,16 +251,4 @@ else
         }
     }
 
-    private async Task HandleImageUpload(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            using var memoryStream = new MemoryStream();
-            await file.OpenReadStream().CopyToAsync(memoryStream);
-            pictureBytes = memoryStream.ToArray();
-            model.Picture = Convert.ToBase64String(pictureBytes);
-        }
-    }
-    
 }
