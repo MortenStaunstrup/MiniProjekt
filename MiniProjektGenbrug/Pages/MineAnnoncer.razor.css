@@ -1,3 +1,58 @@
+@keyframes wiggleEvery6s {
+    0%, 88%, 100% {
+        transform: rotate(0deg);
+    }
+    89% {
+        transform: rotate(12deg);
+    }
+    90% {
+        transform: rotate(-12deg);
+    }
+    91% {
+        transform: rotate(10deg);
+    }
+    92% {
+        transform: rotate(-10deg);
+    }
+    93% {
+        transform: rotate(8deg);
+    }
+    94% {
+        transform: rotate(-8deg);
+    }
+    95% {
+        transform: rotate(6deg);
+    }
+    96% {
+        transform: rotate(-6deg);
+    }
+    97% {
+        transform: rotate(3deg);
+    }
+    98% {
+        transform: rotate(-3deg);
+    }
+    99% {
+        transform: rotate(0deg);
+    }
+}
+
+.bud {
+    animation: wiggleEvery6s 6s infinite ease-in-out;
+    display: inline-block;
+    position: relative;
+    top: 2px;
+}
+.cirkel {
+    border-radius: 50%;
+    background: cornflowerblue;
+    position: absolute;
+    left: 290px;
+    height: 29px;
+    margin-bottom: 107px;
+    width: 33px;
+    text-align: center;
+}
 #titlebar {
     position: absolute;
     left: 50px;
