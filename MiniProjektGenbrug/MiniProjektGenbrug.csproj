@@ -20,4 +20,9 @@
       <None Include="wwwroot\sample-data\Alanson_Headshot.jpg" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Komponenter\Cartpanel.razor" />
+      <_ContentIncludedByDefault Remove="Komponenter\OpretAnnonce.razor" />
+    </ItemGroup>
+
 </Project>

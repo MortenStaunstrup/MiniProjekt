@@ -51,6 +51,11 @@ else
         <InputNumber @bind-Value="MinPrice" class="form-control" placeholder="Min pris" />
         <InputNumber @bind-Value="MaxPrice" class="form-control" placeholder="Max pris" />
         <button class="btn btn-primary" @onclick="Search">Filtrer</button>
+
+    <div class="input-group mb-3" style="width: 30%">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon1" @onclick="Search">Søg</button>
+        <InputText @bind-Value="@SearchText" type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1"></InputText>
+
     </div>
 
     <div class="altindhold">

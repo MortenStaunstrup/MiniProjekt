@@ -12,8 +12,9 @@
         <div id="checkud" @onclick="ToggleCartPanel">
             <i class="fa fa-shopping-cart" style="font-size:36px"></i>
             <div id="indkøbstal"><p id="tal">@cartItems.Count</p></div>
-            </div>
-        @if (show == true)
+        </div>
+
+        @if (show)
         {
             <div class="cart-panel">
                 <button class="close-button" @onclick="ToggleCartPanel">×</button>
@@ -24,7 +25,10 @@
                     <ul>
                         @foreach (var product in cartItems)
                         {
-                            <li>@product.Productname - @product.Price.ToString("C")</li>
+                            <li style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>@product.Productname - @product.Price.ToString("C")</span>
+                                <button class="delete-button" @onclick="() => RemoveFromCart(product)">Slet</button>
+                            </li>
                         }
                     </ul>
                 }
@@ -34,7 +38,6 @@
                 }
 
                 <div class="buttons-container">
-                    <button @onclick="ToggleEditMode">Rediger</button>
                     <button class="checkout-button">Gå til betaling</button>
                 </div>
             </div>
@@ -48,7 +51,6 @@
 
 @code {
     private bool show = false;
-    private bool isEditing = false;
 
     private List<Product> cartItems = new()
     {
@@ -57,20 +59,11 @@
 
     private void ToggleCartPanel()
     {
-        if (show == true)
-        {
-            show = false;
-        }
-        else
-        {
-            show = true;
-        }
+        show = !show;
         Console.WriteLine($"Cartpanel vises: {show}");
     }
-
-    private void ToggleEditMode()
+    private void RemoveFromCart(Product product)
     {
-        isEditing = !isEditing;
-        StateHasChanged();
+        cartItems.Remove(product);
     }
 }
