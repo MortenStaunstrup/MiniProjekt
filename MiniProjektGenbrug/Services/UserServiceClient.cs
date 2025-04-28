@@ -1,159 +1,81 @@
 using Blazored.LocalStorage;
 using Core;
 using MiniProjektGenbrug.Services.Interfaces;
+using System.Net.Http;
+using System.Net.Http.Json;
 
-namespace MiniProjektGenbrug.Services;
-
-public class UserServiceClient : IUserService
+namespace MiniProjektGenbrug.Services
 {
-
-    private ILocalStorageService localStorage { get; set; }
-    public UserServiceClient(ILocalStorageService localStorage)
+    public class UserServiceClient : IUserService
     {
-        this.localStorage = localStorage;
-    }
-    
-    private List<User> users = new List<User>()
-    {
-        new User
-        {
-            id = 1,
-            Username = "Jonathan",
-            Password = "password1",
-            Email = "user1@example.com",
-            Role = "Seller",
-            Products = new List<Product>
-            {
-                new Product
-                {
-                    id = 1,
-                    Price = 29.99,
-                    Productname = "T-Shirt",
-                    Description = "Casual cotton t-shirt",
-                    Category = "Clothing",
-                    Color = "Blue",
-                    Picture = null,
-                    Size = "M",
-                    Status = "Available",
-                    BuyerId = null
-                },
-                new Product
-                {
-                    id = 2,
-                    Price = 59.99,
-                    Productname = "Jeans",
-                    Description = "Stylish denim jeans",
-                    Category = "Clothing",
-                    Color = "Black",
-                    Picture = null,
-                    Size = "L",
-                    Status = "Available",
-                    BuyerId = null
-                },
-                new Product
-                {
-                    id = 3,
-                    Price = 199.99,
-                    Productname = "Smartphone",
-                    Description = "Latest model with high-end features",
-                    Category = "Electronics",
-                    Color = "Silver",
-                    Picture = null,
-                    Size = "N/A",
-                    Status = "Sold",
-                    BuyerId = 2
-                }
-            },
-            BuyHistory = new List<Product>()
-            {
+        private readonly HttpClient _httpClient;
+        private readonly ILocalStorageService _localStorage;
 
-            }
-        },
-        new User
+        public UserServiceClient(HttpClient httpClient, ILocalStorageService localStorage)
         {
-            id = 2,
-            Username = "Olga",
-            Password = "password2",
-            Email = "user2@example.com",
-            Role = "Buyer",
-            Products = new List<Product>()
-            {
-                new Product
-                {
-                    id = 4,
-                    Price = 79.99,
-                    Productname = "Running Shoes",
-                    Description = "Comfortable and durable running shoes",
-                    Category = "Footwear",
-                    Color = "Red",
-                    Picture = null,
-                    Size = "10",
-                    Status = "Available",
-                    BuyerId = null
-                },
-                new Product
-                {
-                    id = 5,
-                    Price = 499.99,
-                    Productname = "Laptop",
-                    Description = "Lightweight laptop with powerful performance",
-                    Category = "Electronics",
-                    Color = "Gray",
-                    Picture = null,
-                    Size = "N/A",
-                    Status = "Pending",
-                    BuyerId = null
-                }
-            },
-            BuyHistory = new List<Product>
-            {
-                new Product
-                {
-                    id = 3,
-                    Price = 199.99,
-                    Productname = "Smartphone",
-                    Description = "Latest model with high-end features",
-                    Category = "Electronics",
-                    Color = "Silver",
-                    Picture = null,
-                    Size = "N/A",
-                    Status = "Sold",
-                    BuyerId = 2
-                }
-            }
+            _httpClient = httpClient;
+            _localStorage = localStorage;
         }
-    };
-    
-    
-    public async Task<User?> GetUserLoggedIn()
-    {
-        var res = await localStorage.GetItemAsync<User>("user");
-        return res;
-    }
 
-    public async Task<User?> GetUserById(int id)
-    {
-        return users.FirstOrDefault((x => x.id == id));
-    }
-
-    public async Task<bool> Login(string username, string password)
-    {
-        var res = users.FirstOrDefault(x => x.Username == username && x.Password == password);
-        if (res != null)
+        public async Task<User?> GetUserLoggedIn()
         {
-            localStorage.SetItemAsync("user", new User { id = res.id, Username = res.Username });
-            return true;
+            return await _localStorage.GetItemAsync<User>("user");
         }
-        return false;
-    }
+        
 
-    public List<Product?> GetUserProducts(int userId)
-    {
-        return users.FirstOrDefault(x => x.id == userId).Products;
-    }
+        public async Task<User?> GetUserById(int id)
+        {
+            var user = await _httpClient.GetFromJsonAsync<User>($"/api/users/{id}");
+            return user;
+        }
 
-    public List<Product> GetUserBuyHistory(int userId)
-    {
-        throw new NotImplementedException();
+        public async Task<User?> Login(string username, string password)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/users/login", new
+            {
+                Username = username,
+                Password = password
+            });
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var user = await response.Content.ReadFromJsonAsync<User>();
+            if (user != null)
+                await _localStorage.SetItemAsync("user", user);
+            return user;
+        }
+
+        public async Task<User?> CreateUserAsync(string username, string email, string password)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/users/register", new
+            {
+                Username = username,
+                Email = email,
+                Password = password
+            });
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var newUser = await response.Content.ReadFromJsonAsync<User>();
+            if (newUser != null)
+                await _localStorage.SetItemAsync("user", newUser);
+            return newUser;
+        }
+
+        public async Task<List<Product>> GetUserProducts(int userId)
+        {
+            var products = await _httpClient
+                .GetFromJsonAsync<List<Product>>($"/api/users/{userId}/products");
+            return products ?? new List<Product>();
+        }
+
+        public async Task<List<Product>> GetUserBuyHistory(int userId)
+        {
+            var history = await _httpClient
+                .GetFromJsonAsync<List<Product>>($"/api/users/{userId}/buyhistory");
+            return history ?? new List<Product>();
+        }
     }
 }

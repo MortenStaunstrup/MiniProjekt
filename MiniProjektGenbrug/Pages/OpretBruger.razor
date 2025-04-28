@@ -1,0 +1,34 @@
+@page "/opret"
+@using MiniProjektGenbrug.Services.Interfaces
+@inject IUserService userService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager nav
+
+
+<input @bind="username" placeholder="Brugernavn" />
+<input @bind="email" type="email" placeholder="Email" />
+<input @bind="password" type="password" placeholder="Adgangskode" />
+<button @onclick="TryRegister">Opret bruger</button>
+@code {
+    string username;
+    string email;
+    string password;
+    string role;
+    string message;
+
+    async Task TryRegister()
+    {
+        var user = await userService.CreateUserAsync(username, email, password);
+
+        
+        if (user != null)
+        {
+            await localStorage.SetItemAsync("user", user);
+            nav.NavigateTo("/login");
+        }
+        else
+        {
+            message = "Brugernavn findes allerede.";
+        }
+    }
+}
