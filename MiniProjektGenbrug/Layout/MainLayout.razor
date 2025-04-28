@@ -27,10 +27,7 @@
                         {
                             <li style="display: flex; justify-content: space-between; align-items: center;">
                                 <span>@product.Productname - @product.Price.ToString("C")</span>
-                                @if (isEditing)
-                                {
-                                    <button class="delete-button" @onclick="() => RemoveFromCart(product)">Slet</button>
-                                }
+                                <button class="delete-button" @onclick="() => RemoveFromCart(product)">Slet</button>
                             </li>
                         }
                     </ul>
@@ -41,7 +38,6 @@
                 }
 
                 <div class="buttons-container">
-                    <button @onclick="ToggleEditMode">@((isEditing ? "Stop redigering" : "Rediger"))</button>
                     <button class="checkout-button">Gå til betaling</button>
                 </div>
             </div>
@@ -55,7 +51,6 @@
 
 @code {
     private bool show = false;
-    private bool isEditing = false;
 
     private List<Product> cartItems = new()
     {
@@ -67,13 +62,6 @@
         show = !show;
         Console.WriteLine($"Cartpanel vises: {show}");
     }
-
-    private void ToggleEditMode()
-    {
-        isEditing = !isEditing;
-        StateHasChanged();
-    }
-
     private void RemoveFromCart(Product product)
     {
         cartItems.Remove(product);
