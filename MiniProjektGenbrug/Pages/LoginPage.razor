@@ -33,7 +33,7 @@
     if (user.Username != null)
     {
       await localStorage.SetItemAsync("user", user);
-      nav.NavigateTo("home");
+      nav.NavigateTo("/", forceLoad: true);
     }
     else
     {
