@@ -16,7 +16,7 @@
 }
 else
 {
-    <button class="Tilføj" @onclick="() => showModal = true"><span>Tilføj ny vare</span></button>
+    <button class="Tilføj" @onclick="() => { showModal = true; editing = false; }"><span>Tilføj ny vare</span></button>
 
     <div class="Mineannoncer">
         @foreach (var annonce in _dineAnnoncer)
@@ -50,7 +50,7 @@ else
             <button class="close-button" @onclick="CloseModal">X</button>
 
             <h3>Tilføj ny annonce</h3>
-
+            <OpretAnnoncer Editing="editing" />
             <EditForm EditContext="EditContext" OnSubmit="AddAd">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -115,7 +115,14 @@ else
                     </div>
 
                     <div class="form-item">
-                        <button type="submit">Tilføj annonce</button>
+                        @if (!editing)
+                        {
+                            <button type="submit">Tilføj annonce</button>
+                        }
+                        else
+                        {
+                            <button type="submit">Redigere annonce</button>
+                        }
                     </div>
                 </div>
             </EditForm>
@@ -127,7 +134,6 @@ else
     User? currentUser;
     List<Product>? _dineAnnoncer;
     bool showModal = false;
-
     bool editing = false;
     private Product model;
     private EditContext EditContext;
@@ -198,7 +204,6 @@ else
     private void CloseModal()
     {
         showModal = false;
-        editing = false;
     }
 
     private async Task AddAd()
