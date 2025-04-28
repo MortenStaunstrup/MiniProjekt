@@ -22,6 +22,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSingleton<IProductRepository, ProductMongoDBRepository>();
 builder.Services.AddSingleton<IRoomRepository, RoomMongoDBRepository>();
+builder.Services.AddSingleton<IUserRepository, UserMongoDBRepository>();
+
 
 var app = builder.Build();
 

@@ -2,6 +2,7 @@
 @using Core
 @using Services.Interfaces
 @inject IProductService _ProductService
+@inject IRoomService roomService
 @inject NavigationManager navMan
 @inject IUserService loginService
 @inject IRoomService IRoomService
@@ -10,47 +11,83 @@
 <PageTitle>Marked</PageTitle>
 
 <h1>Marked</h1>
+
 @if (_filteredProducts == null)
 {
-    <p>Loading your marked...</p>
+    <p>Loading marked...</p>
 }
 else
 {
+    <div class="input-group mb-3">
+        <InputText @bind-Value="SearchText" placeholder="Søg..." class="form-control" />
+
+        @if (_products != null)
+        {
+            <InputSelect @bind-Value="SelectedCategory" class="form-select">
+                <option value="">Alle kategorier</option>
+                @foreach (var cat in _products.Where(p => p.Category != null).Select(p => p.Category).Distinct())
+                {
+                    <option value="@cat">@cat</option>
+                }
+            </InputSelect>
+
+            <InputSelect @bind-Value="SelectedColor" class="form-select">
+                <option value="">Alle farver</option>
+                @foreach (var col in _products.Where(p => p.Color != null).Select(p => p.Color).Distinct())
+                {
+                    <option value="@col">@col</option>
+                }
+            </InputSelect>
+
+            <InputSelect @bind-Value="SelectedSize" class="form-select">
+                <option value="">Alle størrelser</option>
+                @foreach (var sz in _products.Where(p => p.Size != null).Select(p => p.Size).Distinct())
+                {
+                    <option value="@sz">@sz</option>
+                }
+            </InputSelect>
+        }
+
+        <InputNumber @bind-Value="MinPrice" class="form-control" placeholder="Min pris" />
+        <InputNumber @bind-Value="MaxPrice" class="form-control" placeholder="Max pris" />
+        <button class="btn btn-primary" @onclick="Search">Filtrer</button>
+
     <div class="input-group mb-3" style="width: 30%">
         <button class="btn btn-outline-secondary" type="button" id="button-addon1" @onclick="Search">Søg</button>
         <InputText @bind-Value="@SearchText" type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1"></InputText>
+
     </div>
-    
+
     <div class="altindhold">
-        
         @foreach (var article in _filteredProducts)
-            // @onclick="() => showModal = true" --!> til indholdprvare
         {
-            @if (article.Status != "Gennemført")
+            if (article.Status != "Gennemført")
             {
                 <div class="indholdprvare">
                     <div class="DivPic">
-                        <img src="@(article.PictureSrc != null ? article.PictureSrc : "sample-data/noImgAvailable.png")" alt="Billede af vare">
+                        <img src="@(article.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" />
                     </div>
                     <div class="tekstdiv">
                         <span>@article.Productname</span>
                         <span>@article.Size - @article.Color</span>
-                        <span> Status: @article.Status</span>
+                        <span>Status: @article.Status</span>
                         <span>@article.RoomName</span>
-                        <span> @article.Price,- DKK</span>
-                 
+                        <span>@article.Price,- DKK</span>
                     </div>
                 </div>
             }
         }
-
     </div>
 }
 
 @code {
-
     private string SearchText;
-    
+    private string SelectedCategory = "";
+    private string SelectedColor = "";
+    private string SelectedSize = "";
+    private decimal? MinPrice = null;
+    private decimal? MaxPrice = null;
+
     private List<Product> _products;
     private List<Product> _filteredProducts;
     private User? currentUser;
@@ -64,45 +101,32 @@ else
         foreach (var p in _products)
         {
             if (p.Picture != null)
-                p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+                p.PictureSrc = $"data:image/gif;base64,{p.Picture}";
         }
-        
     }
 
     private void Search()
     {
-        if (SearchText == "")
-        {
-            _filteredProducts = _products;
-            StateHasChanged();
-        }
-        else
-        {
-            _filteredProducts = _products.FindAll(x => x.Productname.ToLower().Contains(SearchText.ToLower()));
-            _filteredProducts.AddRange(_products.FindAll(x => x.Category.ToLower().Contains(SearchText.ToLower())));
-            _filteredProducts.AddRange(_products.FindAll(x => x.Color.ToLower().Contains(SearchText.ToLower())));
-            StateHasChanged();
-        }
+        _filteredProducts = _products
+            .Where(x => string.IsNullOrWhiteSpace(SearchText) ||
+                        x.Productname.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                        x.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                        x.Color.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+            .Where(x => string.IsNullOrWhiteSpace(SelectedCategory) || x.Category == SelectedCategory)
+            .Where(x => string.IsNullOrWhiteSpace(SelectedColor) || x.Color == SelectedColor)
+            .Where(x => string.IsNullOrWhiteSpace(SelectedSize) || x.Size == SelectedSize)
+            .Where(x => !MinPrice.HasValue || x.Price >= (double)MinPrice.Value)
+            .Where(x => !MaxPrice.HasValue || x.Price <= (double)MaxPrice.Value)
+            .ToList();
+
+        StateHasChanged();
     }
-    
-    /*
-        if (currentUser == null)
-        {
-            navMan.NavigateTo("login");
-        }
-        else
-        {
-            _products = _ProductService.GetProductsById().ToArray();
-        }
-    }
-*/
 
     private async Task ReturnProduct(int id)
     {
         if (currentUser != null)
         {
-            _products = await _ProductService.GetAllProducts(); // Opdatere tøjet
+            _products = await _ProductService.GetAllProducts(); // Opdaterer tøjet
         }
     }
-    
 }

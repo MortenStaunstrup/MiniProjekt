@@ -153,7 +153,7 @@ else
         model = new Product();
         EditContext = new EditContext(model);
         // Test kode
-        var theUser = await userService.GetUserById(1);
+        /*var theUser = await userService.GetUserById("1");
         var theDataSavedInLocalstorage = new User()
         {
             id = theUser.id,
@@ -161,6 +161,7 @@ else
             Role = theUser.Role
         };
         //
+        
         await localStorage.SetItemAsync("user", theDataSavedInLocalstorage);
 
         currentUser = await userService.GetUserLoggedIn();
@@ -168,6 +169,7 @@ else
         {
             navMan.NavigateTo("login");
         }
+        */
         // Ændre kode til kun at vise produkter fra brugeren !!!
         _dineAnnoncer = await productService.GetAllProducts();
         

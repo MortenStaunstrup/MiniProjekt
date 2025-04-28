@@ -1,9 +1,10 @@
+using Blazored.LocalStorage;
 using MiniProjektGenbrug.Services.Interfaces;
 using Core;
 
 namespace MiniProjektGenbrug.Services;
 
-public class ProductServiceClient : IProductService
+public class ProductServiceClient(HttpClient http, ILocalStorageService storage) : IProductService
 {
     
     List<Product> products = new List<Product>
@@ -111,4 +112,5 @@ public class ProductServiceClient : IProductService
             product.BuyerId = updatedProduct.BuyerId;
         }
     }
+
 }
