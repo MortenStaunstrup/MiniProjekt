@@ -6,7 +6,9 @@ public interface IProductService
 { 
     Task<List<Product>> GetAllProducts();
     Task<Product> GetProductById(int id);
-    void DeleteProductById(int id);
-    void AddProduct(Product product);
-    void UpdateProductById(int id, Product product);
+    Task<List<Product>?> GetBuyHistoryByUserId(int userId);
+    Task<List<Product>?> GetProductsByUserId(int userId);
+    void DeleteProductById(int id, int userId);
+    void AddProduct(Product product, int userId);
+    void UpdateProductById(int id, int userId, Product product);
 }

@@ -17,19 +17,29 @@
   string password;
   string message;
 
-  async Task TryLogin()
+  protected override async Task OnInitializedAsync()
+  {
+    var user = await userService.GetUserLoggedIn();
+    if (user != null)
+    {
+      nav.NavigateTo("home");
+    }
+  }
+
+  private async Task TryLogin()
   {
     var user = await userService.Login(username, password);
 
-    if (user != null)
+    if (user.Username != null)
     {
-      // allerede gemt i lokal storage
-      nav.NavigateTo("/home");
+      await localStorage.SetItemAsync("user", user);
+      nav.NavigateTo("home");
     }
     else
     {
-      message = "Login fejlede. Tjek dine oplysninger.";
+      message = "Wrong Username or Password";
     }
+    
   }
 
 

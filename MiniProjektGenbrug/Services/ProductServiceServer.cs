@@ -15,28 +15,38 @@ public class ProductServiceServer : IProductService
     }
     
     
-    public async Task<List<Product>> GetAllProducts()
+    public async Task<List<Product>?> GetAllProducts()
     {
         return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/getall");
     }
 
-    public async Task<Product> GetProductById(int id)
+    public async Task<List<Product>?> GetProductsByUserId(int userId)
+    {
+        return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/getproductsbyuserid/{userId}");
+    }
+
+    public async Task<List<Product>?> GetBuyHistoryByUserId(int userId)
+    {
+        return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/gethistorybyid/{userId}");
+    }
+
+    public async Task<Product?> GetProductById(int id)
     {
         return await _client.GetFromJsonAsync<Product>($"{BaseURL}/getbyid/{id}");
     }
 
-    public void DeleteProductById(int id)
+    public void DeleteProductById(int id, int userId)
     {
-        _client.DeleteAsync($"{BaseURL}/delete/{id}");
+        _client.DeleteAsync($"{BaseURL}/delete/{id}/{userId}");
     }
 
-    public void AddProduct(Product product)
+    public void AddProduct(Product product, int userId)
     {
-       _client.PostAsJsonAsync($"{BaseURL}/add", product);
+       _client.PostAsJsonAsync($"{BaseURL}/add/{userId}", product);
     }
 
-    public void UpdateProductById(int id, Product product)
+    public void UpdateProductById(int id, int userId, Product product)
     {
-        _client.PutAsJsonAsync($"{BaseURL}/update/{id}", product);
+        _client.PutAsJsonAsync($"{BaseURL}/update/{id}/{userId}", product);
     }
 }

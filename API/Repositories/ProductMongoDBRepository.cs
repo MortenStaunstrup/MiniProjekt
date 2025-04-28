@@ -1,6 +1,8 @@
 using System.Buffers.Text;
 using API.Repositories.Interfaces;
 using Core;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 
@@ -44,16 +46,54 @@ public class ProductMongoDBRepository : IProductRepository
     {
         var filter = Builders<Core.User>.Filter.Eq(x => x.id, userId);
         var projection = Builders<Core.User>.Projection.Exclude("_id").Include("Products");
-        var result = await collectionUser.Aggregate().Match(filter).Project<Product>(projection).ToListAsync();
-        return result;
+        var result = await collectionUser
+            .Find(filter)
+            .Project(projection)
+            .FirstOrDefaultAsync();
+
+        var productList = result["Products"]
+            .AsBsonArray
+            .Select(product => BsonSerializer.Deserialize<Product>(product.ToBsonDocument()))
+            .ToList();
+        
+        if (result.Any())
+        {
+            foreach (var p in productList)
+            {
+                if(p.PictureId != null)
+                    p.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(p.PictureId));
+            }
+            return productList;
+        }
+        
+        return productList;
     }
     
     public async Task<List<Product>?> GetBuyHistoryByUserId(int userId)
     {
         var filter = Builders<Core.User>.Filter.Eq(x => x.id, userId);
         var projection = Builders<Core.User>.Projection.Exclude("_id").Include("BuyHistory");
-        var result = await collectionUser.Aggregate().Match(filter).Project<Product>(projection).ToListAsync();
-        return result;
+        var result = await collectionUser
+            .Find(filter)
+            .Project(projection)
+            .FirstOrDefaultAsync();
+
+        var productList = result["BuyHistory"]
+            .AsBsonArray
+            .Select(product => BsonSerializer.Deserialize<Product>(product.ToBsonDocument()))
+            .ToList();
+        
+        if (result.Any())
+        {
+            foreach (var p in productList)
+            {
+                if(p.PictureId != null)
+                    p.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(p.PictureId));
+            }
+            return productList;
+        }
+        
+        return productList;
     }
 
     public async Task<Product?> GetProductById(int id)
@@ -69,15 +109,15 @@ public class ProductMongoDBRepository : IProductRepository
     public async Task<int> GetMaxProductId()
     {
         var sort = Builders<Product>.Sort.Descending(x => x.id);
-        var maxProduct = await collection
+        var maxProductId = await collection
             .Find(Builders<Product>.Filter.Empty)
             .Sort(sort)
             .Limit(1)
             .FirstOrDefaultAsync();
-        return maxProduct.id;
+        return maxProductId?.id ?? 0;
     }
     
-    public async void AddProduct(Product product)
+    public async void AddProduct(Product product, int userId)
     {
         product.id = await GetMaxProductId() + 1;
         if (product.Picture != null)
@@ -87,10 +127,16 @@ public class ProductMongoDBRepository : IProductRepository
             product.Picture = null;
         }
         await collection.InsertOneAsync(product);
+        
+        var filter = Builders<User>.Filter.Eq(x => x.id, userId);
+        var update = Builders<User>.Update.Push("Products", product);
+        
+        await collectionUser.FindOneAndUpdateAsync(filter, update);
+        
         Console.WriteLine("Adding product to DB");
     }
 
-    public async void UpdateProductById(int id, Product product)
+    public async void UpdateProductById(int id, Product product, int userId)
     {
         var productWId = await GetProductById(id);
         productWId.Productname = product.Productname;
@@ -110,12 +156,26 @@ public class ProductMongoDBRepository : IProductRepository
         }
         var filter = Builders<Product>.Filter.Eq(x => x.id, id);
         await collection.ReplaceOneAsync(filter, productWId);
+        
+        var filterUser = Builders<User>.Filter;
+        var filterUserAndProduct = filterUser.And(filterUser.Eq(x => x.id, userId), filterUser.ElemMatch(x => x.Products, c => c.id == productWId.id));
+        
+        var update = Builders<User>.Update.Set("Products.$", productWId);
+        
+        await collectionUser.FindOneAndUpdateAsync(filterUserAndProduct, update);
+        
     }
 
-    public async void DeleteProductById(int id)
+    public async void DeleteProductById(int id, int userId)
     {
         var filter = Builders<Product>.Filter.Eq(x => x.id, id);
         await collection.DeleteOneAsync(filter);
         Console.WriteLine($"Deleting Product: {id}");
+
+        var filterUser = Builders<User>.Filter.Eq(x => x.id, userId);
+        var update = Builders<User>.Update.PullFilter("Products", Builders<Product>.Filter.Eq(x => x.id, id));
+        
+        collectionUser.FindOneAndUpdate(filterUser, update);
+
     }
 }
