@@ -22,9 +22,9 @@ else
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
-                @if (annonce.Status == "Bud")
+                @if (editing == false) /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
                 {
-                    <div class="cirkel"><p class="bud">bud</p></div>
+                    <div class="cirkel" @onclick="OpenBudModal"><p class="bud">bud</p></div>
                 }
                 <div class="Divpic">
                     <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item"/>
@@ -133,6 +133,19 @@ else
         </div>
     </div>
 }
+@if (showBudModal)
+{
+    <div class="modal-backdrop">
+        <div class="bud-modal-content">
+            <button class="close-button" @onclick="CloseBudModal">X</button>
+            <h3>Thomas har budt 500kr på dine sko</h3>
+            <div class="bud-buttons">
+                <button class="btn btn-primary" @onclick="JaBudModal">Ja</button>
+                <button class="btn btn-primary" @onclick="NejBudModal">Nej</button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     User? currentUser;
@@ -141,6 +154,7 @@ else
     bool editing = false;
     private Product model;
     private EditContext EditContext;
+    bool showBudModal = false;
 
     private byte[] pictureBytes;
     
@@ -250,5 +264,22 @@ else
             Console.WriteLine("Annonce fejlet");
         }
     }
+    private void OpenBudModal()
+    {
+        showBudModal = true;
+    }
 
+    private void CloseBudModal()
+    {
+        showBudModal = false;
+    }
+
+    private void JaBudModal()
+    {
+        showBudModal = false;
+    }
+    private void NejBudModal()
+    {
+        showBudModal = false;
+    }
 }

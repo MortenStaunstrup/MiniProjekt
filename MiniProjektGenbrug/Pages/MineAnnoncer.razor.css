@@ -1,3 +1,21 @@
+.bud-modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.bud-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
 @keyframes wiggleEvery6s {
     0%, 88%, 100% {
         transform: rotate(0deg);
@@ -38,7 +56,7 @@
 }
 
 .bud {
-    animation: wiggleEvery6s 6s infinite ease-in-out;
+    animation: wiggleEvery6s 3s infinite ease-in-out;
     display: inline-block;
     position: relative;
     top: 2px;
@@ -52,6 +70,11 @@
     margin-bottom: 107px;
     width: 33px;
     text-align: center;
+    transition: 0.5s;
+}
+.cirkel:hover {
+    background: #3179fb;
+    cursor: pointer;
 }
 #titlebar {
     position: absolute;
