@@ -24,10 +24,17 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    [Route("getproductsbyid/{userId:int}")]
-    public Task<List<Product>?> GetProductsByUserId(int userId)
+    [Route("getproductsbyuserid/{userId:int}")]
+    public async Task<List<Product>?> GetProductsByUserId(int userId)
     {
-        throw new NotImplementedException();
+        return await _productRepository.GetProductsByUserId(userId);
+    }
+
+    [HttpGet]
+    [Route("gethistorybyid/{id:int}")]
+    public async Task<List<Product>?> GetBuyHistoryByUserId(int userId)
+    {
+        return await _productRepository.GetBuyHistoryByUserId(userId);
     }
 
     [HttpGet]
@@ -38,25 +45,25 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    [Route("add")]
-    public void AddProduct(Product product)
+    [Route("add/{userId:int}")]
+    public void AddProduct(Product product, int userId)
     {
         Console.WriteLine("Product in Controller");
-        _productRepository.AddProduct(product);
+        _productRepository.AddProduct(product, userId);
     }
 
     [HttpPut]
-    [Route("update/{id:int}")]
-    public void UpdateProductById(int id, Product product)
+    [Route("update/{id:int}/{userId:int}")]
+    public void UpdateProductById(int id, Product product, int userId)
     {
-        _productRepository.UpdateProductById(id, product);
+        _productRepository.UpdateProductById(id, product, userId);
     }
 
     [HttpDelete]
-    [Route("delete/{id:int}")]
-    public void DeleteProductById(int id)
+    [Route("delete/{id:int}/{userId:int}")]
+    public void DeleteProductById(int id, int userId)
     {
-        _productRepository.DeleteProductById(id);
+        _productRepository.DeleteProductById(id, userId);
     }
     
 }

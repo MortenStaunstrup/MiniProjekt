@@ -1,3 +1,81 @@
+.bud-modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.bud-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+@keyframes wiggleEvery6s {
+    0%, 88%, 100% {
+        transform: rotate(0deg);
+    }
+    89% {
+        transform: rotate(12deg);
+    }
+    90% {
+        transform: rotate(-12deg);
+    }
+    91% {
+        transform: rotate(10deg);
+    }
+    92% {
+        transform: rotate(-10deg);
+    }
+    93% {
+        transform: rotate(8deg);
+    }
+    94% {
+        transform: rotate(-8deg);
+    }
+    95% {
+        transform: rotate(6deg);
+    }
+    96% {
+        transform: rotate(-6deg);
+    }
+    97% {
+        transform: rotate(3deg);
+    }
+    98% {
+        transform: rotate(-3deg);
+    }
+    99% {
+        transform: rotate(0deg);
+    }
+}
+
+.bud {
+    animation: wiggleEvery6s 3s infinite ease-in-out;
+    display: inline-block;
+    position: relative;
+    top: 2px;
+}
+.cirkel {
+    border-radius: 50%;
+    background: cornflowerblue;
+    position: absolute;
+    left: 290px;
+    height: 29px;
+    margin-bottom: 107px;
+    width: 33px;
+    text-align: center;
+    transition: 0.5s;
+}
+.cirkel:hover {
+    background: #3179fb;
+    cursor: pointer;
+}
 #titlebar {
     position: absolute;
     left: 50px;

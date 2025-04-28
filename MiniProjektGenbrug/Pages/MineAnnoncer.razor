@@ -10,20 +10,27 @@
 
 <PageTitle>Dine Annoncer</PageTitle>
 
-@if (_dineAnnoncer == null)
+@if (currentUser == null)
+{
+    <p><i>Validationg credentials...</i></p>
+} else if (_dineAnnoncer == null)
 {
     <p><i>...loading dine annoncer</i></p>
 }
 else
 {
-    <button class="Tilføj" @onclick="() => { showModal = true; editing = false; }"><span>Tilføj ny vare</span></button>
+    <button class="Tilføj" @onclick="AddNewAnnonce"><span>Tilføj ny vare</span></button>
 
     <div class="Mineannoncer">
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
+                @if (annonce.Status == "Bud") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
+                {
+                    <div class="cirkel" @onclick="OpenBudModal"><p class="bud">bud</p></div>
+                }
                 <div class="Divpic">
-                    <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item" />
+                    <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item"/>
                 </div>
                 <div class="Tekstdiv">
                     <span>@annonce.Productname</span>
@@ -129,6 +136,19 @@ else
         </div>
     </div>
 }
+@if (showBudModal)
+{
+    <div class="modal-backdrop">
+        <div class="bud-modal-content">
+            <button class="close-button" @onclick="CloseBudModal">X</button>
+            <h3>Thomas har budt 500kr på dine sko</h3>
+            <div class="bud-buttons">
+                <button class="btn btn-primary" @onclick="JaBudModal">Ja</button>
+                <button class="btn btn-primary" @onclick="NejBudModal">Nej</button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     User? currentUser;
@@ -137,6 +157,7 @@ else
     bool editing = false;
     private Product model;
     private EditContext EditContext;
+    bool showBudModal = false;
 
     private byte[] pictureBytes;
     
@@ -152,34 +173,18 @@ else
     {
         model = new Product();
         EditContext = new EditContext(model);
-        // Test kode
-        /*var theUser = await userService.GetUserById("1");
-        var theDataSavedInLocalstorage = new User()
-        {
-            id = theUser.id,
-            Username = theUser.Username,
-            Role = theUser.Role
-        };
-        //
-        
-        await localStorage.SetItemAsync("user", theDataSavedInLocalstorage);
 
         currentUser = await userService.GetUserLoggedIn();
         if (currentUser == null)
         {
             navMan.NavigateTo("login");
         }
-        */
-        // Ændre kode til kun at vise produkter fra brugeren !!!
-        _dineAnnoncer = await productService.GetAllProducts();
-        
-        // Indsæt hvert billede for hvert product
-        foreach (var p in _dineAnnoncer)
+        else
         {
-            if (p.Picture != null)
-                p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+            await LoadAnnoncer();
         }
-
+        
+        
         // Hent alle rum fra databasen og tilføj navnet til listen af Rooms der kan vælges når man laver sin annonce
         var rooms = await roomService.GetRooms();
         foreach (var r in rooms)
@@ -188,9 +193,24 @@ else
         }
     }
 
+    private async Task LoadAnnoncer()
+    {
+        _dineAnnoncer = await productService.GetProductsByUserId(currentUser.id);
+        
+        if (_dineAnnoncer != null)
+        {
+            // Indsæt hvert billede for hvert product
+            foreach (var p in _dineAnnoncer)
+            {
+                if (p.Picture != null)
+                    p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+            }
+        }
+    }
+
     private void DeleteAnnonce(int id)
     {
-        productService.DeleteProductById(id);
+        productService.DeleteProductById(id, currentUser.id);
         _dineAnnoncer.RemoveAll(x => x.id == id);
         StateHasChanged();
     }
@@ -208,34 +228,6 @@ else
         showModal = false;
     }
 
-    private async Task AddAd()
-    {
-        model.Status = "Available";
-        model.BuyerId = null;
-        if (EditContext.Validate())
-        {
-            if (!editing)
-            {
-                productService.AddProduct(model);
-                Console.WriteLine("Annonce tilføjet:");
-                Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
-
-                navMan.NavigateTo("/alleannoncer");
-            }
-            else
-            {
-                productService.UpdateProductById(model.id, model);
-                Console.WriteLine("Product update");
-                editing = false;
-                CloseModal();
-            }
-        }
-        else
-        {
-            Console.WriteLine("Annonce fejlet");
-        }
-    }
-
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -247,5 +239,58 @@ else
             model.Picture = Convert.ToBase64String(pictureBytes);
         }
     }
-    
+    private async Task AddAd()
+    {
+        model.Status = "Available";
+        model.BuyerId = null;
+        if (EditContext.Validate())
+        {
+            if (!editing)
+            {
+                productService.AddProduct(model, currentUser.id);
+                Console.WriteLine("Annonce tilføjet:");
+                Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
+                await LoadAnnoncer();
+            }
+            else
+            {
+                productService.UpdateProductById(model.id, currentUser.id, model);
+                Console.WriteLine("Product update");
+                editing = false;
+                CloseModal();
+                model = new Product();
+                EditContext = new EditContext(model);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Annonce fejlet");
+        }
+    }
+    private void OpenBudModal()
+    {
+        showBudModal = true;
+    }
+
+    private void CloseBudModal()
+    {
+        showBudModal = false;
+    }
+
+    private void JaBudModal()
+    {
+        showBudModal = false;
+    }
+    private void NejBudModal()
+    {
+        showBudModal = false;
+    }
+    private void AddNewAnnonce()
+    {
+        editing = false;
+        model = new Product();
+        EditContext = new EditContext(model);
+        showModal = true;
+    }
+
 }

@@ -1,7 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @using MiniProjektGenbrug.Services.Interfaces
-@inject IProductService ProductService
 @using Core
+@inject IProductService ProductService
+@inject IUserService loginService
 
 <div class="page">
     <div class="sidebar">
@@ -9,9 +10,24 @@
     </div>
 
     <main id="main">
+        <div id="LogDiv">
+            
+            @if (currentUser == null)
+        {
+            <a class="login glyphicon glyphicon-log-in" href="login"></a> //Login
+            <p class="underlogtekst">Har du ikke en bruger?  <a href="opret">opret</a> her</p>
+        }
+        else
+        {
+            <p class="login">&#128100;</p> //Logget ind
+            <a class="underlogtekst lakind" @onclick="Logout" href="/">Logud</a>
+        }
+</div>
         <div id="checkud" @onclick="ToggleCartPanel">
             <i class="fa fa-shopping-cart" style="font-size:36px"></i>
-            <div id="indkøbstal"><p id="tal">@cartItems.Count</p></div>
+            <div id="indkøbstal">
+                <p id="tal">@cartItems.Count</p>
+            </div>
         </div>
 
         @if (show)
@@ -51,19 +67,34 @@
 
 @code {
     private bool show = false;
-
     private List<Product> cartItems = new()
     {
         new Product { Productname = "Eksempel", Price = 99.99 }
     };
+
+    private User? currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await loginService.GetUserLoggedIn();
+    }
 
     private void ToggleCartPanel()
     {
         show = !show;
         Console.WriteLine($"Cartpanel vises: {show}");
     }
+
     private void RemoveFromCart(Product product)
     {
         cartItems.Remove(product);
+    }
+
+    private async Task Logout()
+    {
+        await loginService.Logout();
+        currentUser = null;
+        StateHasChanged();
+        
     }
 }

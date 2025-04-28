@@ -44,16 +44,29 @@ public class UserController : ControllerBase
         return Ok(newUser);
     }
 
-    [HttpPost]
-    [Route("login")]
-    public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
+    [HttpGet]
+    [Route("login/{username}/{password}")]
+    public async Task<User?> Login(string username, string password)
     {
-        // Login funktionalitet
-        var user = await _userRepository.GetUserByUsernameAndPassword(request.Username, request.Password);
-        if (user == null)
-            return Unauthorized("Incorrect username or password.");
-
-        return Ok(new { user.id, user.Username, user.Email, user.Role });
+        var user = await _userRepository.GetUserByUsernameAndPassword(username, password);
+        if (user != null)
+        {
+            return new User()
+            {
+                id = user.id,
+                Email = user.Email,
+                Username = user.Username,
+                Role = user.Role,
+            };
+        }
+        else
+        {
+           return new User()
+            {
+               
+            };
+        }
+        
     }
 
     [HttpGet]
