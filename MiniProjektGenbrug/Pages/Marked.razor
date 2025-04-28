@@ -18,40 +18,7 @@
 }
 else
 {
-    <div class="input-group mb-3">
-        <InputText @bind-Value="SearchText" placeholder="Søg..." class="form-control" />
-
-        @if (_products != null)
-        {
-            <InputSelect @bind-Value="SelectedCategory" class="form-select">
-                <option value="">Alle kategorier</option>
-                @foreach (var cat in _products.Where(p => p.Category != null).Select(p => p.Category).Distinct())
-                {
-                    <option value="@cat">@cat</option>
-                }
-            </InputSelect>
-
-            <InputSelect @bind-Value="SelectedColor" class="form-select">
-                <option value="">Alle farver</option>
-                @foreach (var col in _products.Where(p => p.Color != null).Select(p => p.Color).Distinct())
-                {
-                    <option value="@col">@col</option>
-                }
-            </InputSelect>
-
-            <InputSelect @bind-Value="SelectedSize" class="form-select">
-                <option value="">Alle størrelser</option>
-                @foreach (var sz in _products.Where(p => p.Size != null).Select(p => p.Size).Distinct())
-                {
-                    <option value="@sz">@sz</option>
-                }
-            </InputSelect>
-        }
-
-        <InputNumber @bind-Value="MinPrice" class="form-control" placeholder="Min pris" />
-        <InputNumber @bind-Value="MaxPrice" class="form-control" placeholder="Max pris" />
-        <button class="btn btn-primary" @onclick="Search">Filtrer</button>
-
+    
     <div class="input-group mb-3" style="width: 30%">
         <button class="btn btn-outline-secondary" type="button" id="button-addon1" @onclick="Search">Søg</button>
         <InputText @bind-Value="@SearchText" type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1"></InputText>
