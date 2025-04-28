@@ -16,13 +16,13 @@
 }
 else
 {
-    <button class="Tilføj" @onclick="() => { showModal = true; editing = false; }"><span>Tilføj ny vare</span></button>
+    <button class="Tilføj" @onclick="AddNewAnnonce"><span>Tilføj ny vare</span></button>
 
     <div class="Mineannoncer">
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
-                @if (editing == false) /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
+                @if (annonce.Status == "Bud") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
                 {
                     <div class="cirkel" @onclick="OpenBudModal"><p class="bud">bud</p></div>
                 }
@@ -237,7 +237,7 @@ else
                 Console.WriteLine("Annonce tilføjet:");
                 Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
 
-                navMan.NavigateTo("/alleannoncer");
+                navMan.NavigateTo("/mineannoncer");
             }
             else
             {
@@ -270,4 +270,12 @@ else
     {
         showBudModal = false;
     }
+    private void AddNewAnnonce()
+    {
+        editing = false;
+        model = new Product();
+        EditContext = new EditContext(model);
+        showModal = true;
+    }
+
 }
