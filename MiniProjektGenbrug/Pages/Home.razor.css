@@ -1,9 +1,9 @@
 .home-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    min-height: 80vh;
+    min-height: 100vh;
     text-align: center;
     padding: 2rem;
     background: whitesmoke;
@@ -12,16 +12,70 @@
 .home-container h1 {
     font-size: 2.5rem;
     color: #333;
+    margin-top: 20px;
     margin-bottom: 1rem;
 }
 
 .home-subtext {
     font-size: 1.2rem;
     color: #555;
-    max-width: 600px;
+    max-width: 700px;
+    margin-bottom: 2rem;
 }
 
+.features-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    width: 100%;
+    margin-top: 30px;
+}
 
+.feature-box {
+    background: linear-gradient(135deg, #f3f3f3, #e0e0e0);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.feature-box h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.feature-box p {
+    font-size: 1rem;
+    color: #666;
+}
+
+.feature-box i {
+    font-size: 2.5rem;
+    color: #3a0647;
+    margin-bottom: 10px;
+}
+
+.feature-box.buy {
+    background-color: #f9f0f9;
+    border: 2px solid #3a0647;
+}
+
+.feature-box.sell {
+    background-color: #fff6e6;
+    border: 2px solid #f39c12;
+}
+
+.feature-box.recycle {
+    background-color: #e9f7e6;
+    border: 2px solid #2ecc71;
+}
 .help-button {
     position: fixed;
     bottom: 20px;
@@ -29,12 +83,12 @@
     background-color: #3a0647;
     color: white;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 40px; /* Mindre størrelse */
+    height: 40px; /* Mindre størrelse */
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 18px; /* Mindre ikon */
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     z-index: 1000;
@@ -44,30 +98,32 @@
     background-color: #502a6a;
 }
 
-
 .help-box {
     position: fixed;
-    bottom: 90px; 
+    bottom: 70px;
     left: 20px;
-    width: 250px;
+    width: 220px; 
     background-color: white;
-    padding: 1rem;
+    padding: 0.8rem; 
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    font-size: 14px;
+    font-size: 10px; 
     color: #333;
     z-index: 1000;
     text-align: left;
 }
 
+.help-box p {
+    margin-bottom: 0.5rem; 
+}
 
 .close-help {
     position: absolute;
-    top: 8px;
-    right: 10px;
+    top: 7px;
+    right: 8px; 
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 14px; 
     color: #888;
     cursor: pointer;
 }
