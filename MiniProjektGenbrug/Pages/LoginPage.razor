@@ -1,0 +1,36 @@
+@page "/login"
+@using MiniProjektGenbrug.Services.Interfaces
+@inject IUserService userService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager nav
+
+<h3>Log ind</h3>
+
+<input @bind="username" placeholder="Brugernavn" />
+<input @bind="password" type="password" placeholder="Adgangskode" />
+<button @onclick="TryLogin">Log ind</button>
+
+<p>@message</p>
+
+@code {
+  string username;
+  string password;
+  string message;
+
+  async Task TryLogin()
+  {
+    var user = await userService.Login(username, password);
+
+    if (user != null)
+    {
+      // allerede gemt i lokal storage
+      nav.NavigateTo("/home");
+    }
+    else
+    {
+      message = "Login fejlede. Tjek dine oplysninger.";
+    }
+  }
+
+
+}

@@ -32,4 +32,9 @@ public class Product
     // FK til Rooms
     [Required]
     public string RoomName { get; set; }
+    
+    [Required]
+    public int SellerId { get; set; }
+    
+    
 }
