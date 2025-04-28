@@ -20,6 +20,6 @@ builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddSingleton<IProductService, ProductServiceServer>();
 builder.Services.AddSingleton<IRoomService, RoomServiceServer>();
-builder.Services.AddSingleton<IUserService, UserServiceClient>();
+builder.Services.AddScoped<IUserService, UserServiceClient>();
 
 await builder.Build().RunAsync();
