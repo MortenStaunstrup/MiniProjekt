@@ -21,12 +21,12 @@ public class RoomMongoDBRepository : IRoomRepository
     public async Task<int> GetMaxRoomId()
     {
         var sort = Builders<Room>.Sort.Descending(x => x.id);
-        var maxProduct = await collection
+        var maxRoomId = await collection
             .Find(Builders<Room>.Filter.Empty)
             .Sort(sort)
             .Limit(1)
             .FirstOrDefaultAsync();
-        return maxProduct.id;
+        return maxRoomId?.id ?? 0;
     }
     
     public async Task<List<Room>> GetRooms()

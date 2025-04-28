@@ -10,6 +10,7 @@ namespace MiniProjektGenbrug.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
+        private string BaseURL = "http://localhost:5189/api/users";
 
         public UserServiceClient(HttpClient httpClient, ILocalStorageService localStorage)
         {
@@ -31,19 +32,7 @@ namespace MiniProjektGenbrug.Services
 
         public async Task<User?> Login(string username, string password)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/users/login", new
-            {
-                Username = username,
-                Password = password
-            });
-
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            var user = await response.Content.ReadFromJsonAsync<User>();
-            if (user != null)
-                await _localStorage.SetItemAsync("user", user);
-            return user;
+            return await _httpClient.GetFromJsonAsync<User?>($"{BaseURL}/login/{username}/{password}");
         }
 
         public async Task<User?> CreateUserAsync(string username, string email, string password)
@@ -62,20 +51,6 @@ namespace MiniProjektGenbrug.Services
             if (newUser != null)
                 await _localStorage.SetItemAsync("user", newUser);
             return newUser;
-        }
-
-        public async Task<List<Product>> GetUserProducts(int userId)
-        {
-            var products = await _httpClient
-                .GetFromJsonAsync<List<Product>>($"/api/users/{userId}/products");
-            return products ?? new List<Product>();
-        }
-
-        public async Task<List<Product>> GetUserBuyHistory(int userId)
-        {
-            var history = await _httpClient
-                .GetFromJsonAsync<List<Product>>($"/api/users/{userId}/buyhistory");
-            return history ?? new List<Product>();
         }
     }
 }

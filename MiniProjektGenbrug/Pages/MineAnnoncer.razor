@@ -10,7 +10,10 @@
 
 <PageTitle>Dine Annoncer</PageTitle>
 
-@if (_dineAnnoncer == null)
+@if (currentUser == null)
+{
+    <p><i>Validationg credentials...</i></p>
+} else if (_dineAnnoncer == null)
 {
     <p><i>...loading dine annoncer</i></p>
 }
@@ -176,16 +179,12 @@ else
         {
             navMan.NavigateTo("login");
         }
-        
-        // Ændre kode til kun at vise produkter fra brugeren !!!
-        _dineAnnoncer = await productService.GetAllProducts();
-        
-        // Indsæt hvert billede for hvert product
-        foreach (var p in _dineAnnoncer)
+        else
         {
-            if (p.Picture != null)
-                p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+            await LoadAnnoncer();
         }
+        
+        
         // Hent alle rum fra databasen og tilføj navnet til listen af Rooms der kan vælges når man laver sin annonce
         var rooms = await roomService.GetRooms();
         foreach (var r in rooms)
@@ -194,9 +193,24 @@ else
         }
     }
 
+    private async Task LoadAnnoncer()
+    {
+        _dineAnnoncer = await productService.GetProductsByUserId(currentUser.id);
+        
+        if (_dineAnnoncer != null)
+        {
+            // Indsæt hvert billede for hvert product
+            foreach (var p in _dineAnnoncer)
+            {
+                if (p.Picture != null)
+                    p.PictureSrc = String.Format("data:image/gif;base64,{0}", p.Picture);
+            }
+        }
+    }
+
     private void DeleteAnnonce(int id)
     {
-        productService.DeleteProductById(id);
+        productService.DeleteProductById(id, currentUser.id);
         _dineAnnoncer.RemoveAll(x => x.id == id);
         StateHasChanged();
     }
@@ -233,18 +247,19 @@ else
         {
             if (!editing)
             {
-                productService.AddProduct(model);
+                productService.AddProduct(model, currentUser.id);
                 Console.WriteLine("Annonce tilføjet:");
                 Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
-
-                navMan.NavigateTo("/alleannoncer");
+                await LoadAnnoncer();
             }
             else
             {
-                productService.UpdateProductById(model.id, model);
+                productService.UpdateProductById(model.id, currentUser.id, model);
                 Console.WriteLine("Product update");
                 editing = false;
                 CloseModal();
+                model = new Product();
+                EditContext = new EditContext(model);
             }
         }
         else
