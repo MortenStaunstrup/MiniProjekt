@@ -12,6 +12,7 @@ public class ProductMongoDBRepository : IProductRepository
     private MongoClient _client;
     private IMongoDatabase database;
     private IMongoCollection<Product> collection;
+    private IMongoCollection<User> collectionUser;
     private GridFSBucket bucket;
 
     public ProductMongoDBRepository()
@@ -19,6 +20,7 @@ public class ProductMongoDBRepository : IProductRepository
         _client = new MongoClient(connectionString);
         database = _client.GetDatabase("Genbrug");
         collection = database.GetCollection<Product>("Products");
+        collectionUser = database.GetCollection<User>("Users");
         bucket = new GridFSBucket(database, new GridFSBucketOptions{ BucketName = "Billeder" });
     }
 
@@ -36,6 +38,11 @@ public class ProductMongoDBRepository : IProductRepository
             return result;
         }
         return result;
+    }
+
+    public Task<List<Product>?> GetProductsByUserId(int userId)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Product?> GetProductById(int id)
