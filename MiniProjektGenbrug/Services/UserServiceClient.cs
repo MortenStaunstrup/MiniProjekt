@@ -52,5 +52,10 @@ namespace MiniProjektGenbrug.Services
                 await _localStorage.SetItemAsync("user", newUser);
             return newUser;
         }
+        public async Task Logout()
+        {
+            await _localStorage.RemoveItemAsync("user");
+        }
+
     }
 }
