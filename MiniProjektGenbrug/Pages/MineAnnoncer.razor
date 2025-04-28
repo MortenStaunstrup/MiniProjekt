@@ -22,8 +22,12 @@ else
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
+                @if (annonce.Status == "Bud")
+                {
+                    <div class="cirkel"><p class="bud">bud</p></div>
+                }
                 <div class="Divpic">
-                    <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item" />
+                    <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item"/>
                 </div>
                 <div class="Tekstdiv">
                     <span>@annonce.Productname</span>
