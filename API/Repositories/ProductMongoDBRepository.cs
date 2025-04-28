@@ -40,9 +40,20 @@ public class ProductMongoDBRepository : IProductRepository
         return result;
     }
 
-    public Task<List<Product>?> GetProductsByUserId(int userId)
+    public async Task<List<Product>?> GetProductsByUserId(int userId)
     {
-        throw new NotImplementedException();
+        var filter = Builders<Core.User>.Filter.Eq(x => x.id, userId);
+        var projection = Builders<Core.User>.Projection.Exclude("_id").Include("Products");
+        var result = await collectionUser.Aggregate().Match(filter).Project<Product>(projection).ToListAsync();
+        return result;
+    }
+    
+    public async Task<List<Product>?> GetBuyHistoryByUserId(int userId)
+    {
+        var filter = Builders<Core.User>.Filter.Eq(x => x.id, userId);
+        var projection = Builders<Core.User>.Projection.Exclude("_id").Include("BuyHistory");
+        var result = await collectionUser.Aggregate().Match(filter).Project<Product>(projection).ToListAsync();
+        return result;
     }
 
     public async Task<Product?> GetProductById(int id)
