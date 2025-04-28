@@ -3,23 +3,42 @@
 <PageTitle>Velkommen</PageTitle>
 
 <div class="home-container">
-    <h1>Velkommen til din online genbrugsbutik!</h1>
+    <h1>Velkommen til EAAA's Genbrugsmarked!</h1>
 
     <p class="home-subtext">
-        Gør en forskel for både miljøet og din pengepung ved at købe og sælge genbrug mellem hinanden.
-        Find unikke fund, eller giv dine ting nyt liv hos andre!
+        Hos Erhvervsakademi Aarhus fremmer vi bæredygtighed og giver gamle ting nyt liv. Her kan du både købe og sælge genbrugsvarer blandt studerende og ansatte, hvilket skaber et mere miljøvenligt og økonomisk venligt fællesskab.
     </p>
+
+    <div class="features-container">
+        <div class="feature-box buy">
+            <i class="fa fa-shopping-cart"></i>
+            <h3>Køb Genbrug</h3>
+            <p>Find unikke varer til lave priser, og giv samtidig nye ejere mulighed for at få glæde af dem.</p>
+        </div>
+
+        <div class="feature-box sell">
+            <i class="fa fa-exchange-alt"></i>
+            <h3>Sælg Dine Ting</h3>
+            <p>Har du noget, du ikke længere bruger? Sælg det og gør en god handel, samtidig med at du hjælper miljøet.</p>
+        </div>
+
+        <div class="feature-box recycle">
+            <i class="fa fa-recycle"></i>
+            <h3>Genbrug for Alle</h3>
+            <p>Vær med til at fremme genbrug på campus og skab et grønnere, mere bæredygtigt miljø for os alle.</p>
+        </div>
+    </div>
 </div>
 
 <div class="help-button" @onclick="ToggleHelpBox">
-    <i class="fa fa-question-circle"></i>
+    <i class="fa fa-question-circle"></i> Hjælp
 </div>
 
 @if (showHelpBox)
 {
     <div class="help-box">
         <p>Har du spørgsmål?<br /> 
-            Kontakt os på <strong>dinonlinegenbrug@gmail.com</strong></p>
+            Kontakt os på <strong>genbrugmarked@eaaa.dk</strong></p>
         <button class="close-help" @onclick="ToggleHelpBox">×</button>
     </div>
 }
