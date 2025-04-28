@@ -25,9 +25,16 @@ public class ProductController : ControllerBase
 
     [HttpGet]
     [Route("getproductsbyid/{userId:int}")]
-    public Task<List<Product>?> GetProductsByUserId(int userId)
+    public async Task<List<Product>?> GetProductsByUserId(int userId)
     {
-        throw new NotImplementedException();
+        return await _productRepository.GetProductsByUserId(userId);
+    }
+
+    [HttpGet]
+    [Route("gethistorybyid/{id:int}")]
+    public async Task<List<Product>?> GetBuyHistoryByUserId(int userId)
+    {
+        return await _productRepository.GetBuyHistoryByUserId(userId);
     }
 
     [HttpGet]
