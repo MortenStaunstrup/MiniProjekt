@@ -24,9 +24,9 @@ namespace MiniProjektGenbrug.Services
         }
         
 
-        public async Task<User?> GetUserById(int id)
+        public async Task<User?> GetUserById(int? id)
         {
-            var user = await _httpClient.GetFromJsonAsync<User>($"/api/users/{id}");
+            var user = await _httpClient.GetFromJsonAsync<User>($"{BaseURL}/getbyid/{id}");
             return user;
         }
 

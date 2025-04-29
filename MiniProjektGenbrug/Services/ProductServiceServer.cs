@@ -30,6 +30,11 @@ public class ProductServiceServer : IProductService
         return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/gethistorybyid/{userId}");
     }
 
+    public async Task<bool> ExistsInOwnProducts(int productId, int buyerId)
+    {
+        return await _client.GetFromJsonAsync<bool>($"{BaseURL}/exist/{buyerId}/{productId}");
+    }
+
     public async Task<Product?> GetProductById(int id)
     {
         return await _client.GetFromJsonAsync<Product>($"{BaseURL}/getbyid/{id}");

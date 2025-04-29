@@ -54,9 +54,17 @@ else
             <button class="close-button" @onclick="CloseModal">X</button>
 
             <h3>@shownProduct.Productname</h3>
+            <p>Price: @shownProduct.Price</p>
+            <p>Kan findes i lokale: @shownProduct.RoomName</p>
             
-            
-            <button @onclick="BidOnProduct">Byd på vare?</button>
+            @if (!exist)
+            {
+                <button @onclick="BidOnProduct">Byd på vare?</button>
+            }
+            else
+            {
+                <p>You own this product</p>
+            }
         </div>
     </div>
 }
@@ -74,6 +82,7 @@ else
     private User? currentUser;
     bool showModal = false;
     Product shownProduct;
+    bool exist;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,13 +125,15 @@ else
     private void BidOnProduct()
     {
         _ProductService.BidOnProduct(shownProduct.id, currentUser.id);
-        CloseModal();
+        navMan.NavigateTo("mineindkob");
     }
 
-    private void OpenItem(Product product)
+    private async void OpenItem(Product product)
     {
         shownProduct = product;
         OpenModal();
+        exist = await _ProductService.ExistsInOwnProducts(shownProduct.id, currentUser.id);
+        StateHasChanged();
     }
     
     private void CloseModal()

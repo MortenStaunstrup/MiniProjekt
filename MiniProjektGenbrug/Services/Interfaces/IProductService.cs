@@ -11,6 +11,7 @@ public interface IProductService
     void DeleteProductById(int id, int userId);
     void AddProduct(Product product, int userId);
     void UpdateProductById(int id, int userId, Product product);
+    Task<bool> ExistsInOwnProducts(int productId, int buyerId);
     void AcceptBid(int productId, int sellerId);
     void DeclineBid(int productId, int sellerId);
     void BidOnProduct(int productId, int buyerId);
