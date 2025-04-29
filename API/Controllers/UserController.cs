@@ -1,3 +1,4 @@
+using API.Models;
 using API.Repositories.Interfaces;
 using Core;
 using Microsoft.AspNetCore.Mvc;
@@ -9,23 +10,23 @@ namespace API.Controllers;
 public class UserController : ControllerBase
 {
     private IUserRepository _userRepository;
+    private IProductRepository _productRepository;
 
-    public UserController(IUserRepository userRepository)
+    public UserController(IUserRepository userRepository, IProductRepository productRepository)
     {
         _userRepository = userRepository;
+        _productRepository = productRepository;
     }
 
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
     {
-        // Validering af email
+
         if (string.IsNullOrEmpty(request.Email) || !request.Email.Contains("@"))
         {
             return BadRequest("Invalid email address.");
         }
-
-        // Kontroller om brugeren allerede findes
         var existingUser = await _userRepository.GetUserByEmail(request.Email);
         if (existingUser != null)
             return BadRequest("User already exists.");
@@ -38,42 +39,38 @@ public class UserController : ControllerBase
             Role = request.Role,
             id = await _userRepository.GetMaxUserId() + 1
         };
-
-        // Tilføj ny bruger
+        
         await _userRepository.AddUser(newUser);
         return Ok(newUser);
     }
 
-    [HttpGet]
-    [Route("login/{username}/{password}")]
-    public async Task<User?> Login(string username, string password)
+    [HttpGet("login/{username}/{password}")]
+    public async Task<ActionResult<User>> Login(string username, string password)
     {
         var user = await _userRepository.GetUserByUsernameAndPassword(username, password);
-        if (user != null)
+        if (user == null)
         {
-            return new User()
-            {
-                id = user.id,
-                Email = user.Email,
-                Username = user.Username,
-                Role = user.Role,
-            };
+            return NotFound("Bruger ikke fundet.");
         }
-        else
+
+        return Ok(new User
         {
-           return new User()
-            {
-               
-            };
-        }
-        
+            id = user.id,
+            Email = user.Email,
+            Username = user.Username,
+            Role = user.Role
+        });
     }
 
+
     [HttpGet]
-    [Route("getbyid/{id:int}")]
-    public async Task<User> GetUserById(int id)
+    [Route("{id:int}")]
+    public async Task<IActionResult> GetUserById(int id)
     {
-        return await _userRepository.GetUserById(id);
+        var user = await _userRepository.GetUserById(id);
+        if (user == null)
+            return NotFound("User not found.");
+        return Ok(user);
     }
 
     [HttpGet]
@@ -91,4 +88,47 @@ public class UserController : ControllerBase
         var buyHistory = await _userRepository.GetBuyHistoryByUserId(userId);
         return Ok(buyHistory);
     }
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateUser([FromBody] User user)
+    {
+        var existingUser = await _userRepository.GetUserById(user.id);
+        if (existingUser == null)
+            return NotFound("User not found.");
+
+        await _userRepository.UpdateUser(user);
+        return Ok(user);
+    }
+    [HttpPost("{userId}/addToCart")]
+    public async Task<IActionResult> AddToCart(int userId, [FromBody] AddToCartRequest data)
+    {
+        var user = await _userRepository.GetUserById(userId);
+        if (user == null)
+            return NotFound("User not found.");
+
+        var product = await _productRepository.GetProductById(data.productId);
+        if (product == null)
+            return NotFound("Product not found.");
+        
+        var existingItem = user.Cart?.FirstOrDefault(ci => ci.ProductId == product.id);
+        if (existingItem != null)
+        {
+            existingItem.antal += 1;
+        }
+        else
+        {
+            user.Cart.Add(new CartItem
+            {
+                UserId = userId,
+                ProductId = product.id,
+                Product = product,
+                antal = 1
+            });
+        }
+
+        await _userRepository.UpdateUser(user);
+
+        return Ok(user.Cart);
+    }
+
+
 }

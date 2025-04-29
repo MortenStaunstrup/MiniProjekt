@@ -12,5 +12,7 @@ namespace MiniProjektGenbrug.Services.Interfaces
         Task<User?> Login(string username, string password);
         Task<User> CreateUserAsync(string username, string email, string password);
         Task Logout();
+        Task UpdateUser(User user);
     }
+    
 }

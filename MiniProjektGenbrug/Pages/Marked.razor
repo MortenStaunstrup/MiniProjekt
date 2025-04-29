@@ -5,9 +5,8 @@
 @inject IRoomService roomService
 @inject NavigationManager navMan
 @inject IUserService loginService
-<!--inject ICartService cartService-->
+@inject ICartService cartService
 @inject Blazored.LocalStorage.ILocalStorageService localstorage
-
 
 <PageTitle>Marked</PageTitle>
 
@@ -57,7 +56,6 @@ else
             if (article.Status != "Gennemført")
             {
                 <div class="indholdprvare" @onclick="() => OpenModal(article)" style="cursor: pointer;">
- 
                     <div class="DivPic">
                         <img src="@(article.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" />
                     </div>
@@ -74,56 +72,57 @@ else
     </div>
 }
 
-
 @if (showModal && selectedProduct != null)
 {
+
+
     <div class="modal-backdrop" @onclick="CloseModal">
         <div class="modal-content" @onclick:stopPropagation>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                 <button class="btn btn-danger" @onclick="CloseModal">Luk</button>
-                <!--
-                <button class="btn btn-success" @onclick="() => AddToCart(selectedProduct)">Tilføj til kurv</button>
+                <button class="btn btn-success" @onclick="async () => await AddToCart(selectedProduct)">Tilføj til kurv</button>
+
+
             </div>
-                -->
-                <h2>@selectedProduct.Productname</h2>
-                <img src="@(selectedProduct.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" style="width: 100%; height: auto;"/>
-                <p>Størrelse: @selectedProduct.Size</p>
-                <p>Farve: @selectedProduct.Color</p>
-                <p>Pris: @selectedProduct.Price,- DKK</p>
-                <p>Rum: @selectedProduct.RoomName</p>
-                <p>Status: @selectedProduct.Status</p>
-            </div>
+
+            <h2>@selectedProduct.Productname</h2>
+            <img src="@(selectedProduct.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" style="width: 100%; height: auto;" />
+            <p>Størrelse: @selectedProduct.Size</p>
+            <p>Farve: @selectedProduct.Color</p>
+            <p>Pris: @selectedProduct.Price,- DKK</p>
+            <p>Rum: @selectedProduct.RoomName</p>
+            <p>Status: @selectedProduct.Status</p>
         </div>
-        }
-
-        <style>
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    </div>
 }
 
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90%;
-    overflow-y: auto;
-    position: relative;
-}
+<style>
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90%;
+        overflow-y: auto;
+        position: relative;
+    }
 </style>
 
-        @code {
-
+@code {
     private string SearchText;
     private string SelectedCategory = "";
     private string SelectedColor = "";
@@ -134,12 +133,11 @@ else
     private List<Product> _products;
     private List<Product> _filteredProducts;
     private User? currentUser;
-    bool showModal = false;
-    Product shownProduct;
-    bool exist;
-
-    private Product selectedProduct;
     private bool showModal = false;
+    private Product selectedProduct;
+    private bool exist;
+
+    private List<CartItem> cartItems = new List<CartItem>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,6 +149,11 @@ else
         {
             if (p.Picture != null)
                 p.PictureSrc = $"data:image/gif;base64,{p.Picture}";
+        }
+        
+        if (currentUser != null)
+        {
+            cartItems = await cartService.GetCartItemsAsync(currentUser.id);
         }
     }
 
@@ -179,7 +182,7 @@ else
     {
         showModal = false;
     }
-<!--
+
     private async Task AddToCart(Product product)
     {
         if (currentUser == null)
@@ -188,21 +191,20 @@ else
         var user = await loginService.GetUserById(currentUser.id);
         if (user == null)
             return;
-
-        var cartItem = new CartItem
-        {
-            Product = product,
-            UserId = user.id,
-            antal = 1         
-        };
         
         await cartService.AddProductToCartAsync(user.id, product);
-
+        Console.WriteLine($"Tilføjer produkt med ID: {product.id}");
         
         await localstorage.SetItemAsync("user", user);
         currentUser = user;
+        
+        cartItems = await cartService.GetCartItemsAsync(user.id);
+        
         showModal = false;
+
+        StateHasChanged();
     }
+}
 
 
     private void BidOnProduct()
@@ -214,19 +216,9 @@ else
     private async void OpenItem(Product product)
     {
         shownProduct = product;
-        OpenModal();
+        OpenModal(product);
         exist = await _ProductService.ExistsInOwnProducts(shownProduct.id, currentUser.id);
         StateHasChanged();
-    }
-    
-    private void CloseModal()
-    {
-        showModal = false;
-    }
-
-    private void OpenModal()
-    {
-        showModal = true;
     }
 
 }

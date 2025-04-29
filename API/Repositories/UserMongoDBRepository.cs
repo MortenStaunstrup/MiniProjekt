@@ -3,7 +3,6 @@ using Core;
 using MongoDB.Driver;
 
 namespace API.Repositories;
-    
 
 public class UserMongoDBRepository : IUserRepository
 {
@@ -19,7 +18,7 @@ public class UserMongoDBRepository : IUserRepository
         collection = database.GetCollection<User>("Users");
     }
     
-    public async Task<User?> GetUserById(int? id)
+    public async Task<User?> GetUserById(int id)
     {
         var filter = Builders<User>.Filter.Eq(u => u.id, id);
         return await collection.Find(filter).FirstOrDefaultAsync();
@@ -69,5 +68,36 @@ public class UserMongoDBRepository : IUserRepository
         var filter = Builders<User>.Filter.Eq(u => u.id, userId);
         var user = await collection.Find(filter).FirstOrDefaultAsync();
         return user?.BuyHistory ?? new List<Product>();
+    }
+
+    public async Task UpdateUser(User user)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.id, user.id);
+        await collection.ReplaceOneAsync(filter, user);
+    }
+    
+    public async Task AddToUserCart(int userId, CartItem item)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.id, userId);
+        var update = Builders<User>.Update.Push(u => u.Cart, item);
+        await collection.UpdateOneAsync(filter, update);
+    }
+
+    public async Task<List<CartItem>> GetUserCart(int userId)
+    {
+        var user = await GetUserById(userId);
+        return user?.Cart ?? new List<CartItem>();
+    }
+
+    public async Task RemoveFromUserCart(int userId, int productId)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.id, userId);
+        var update = Builders<User>.Update.PullFilter(u => u.Cart, c => c.Product.id == productId);
+        await collection.UpdateOneAsync(filter, update);
+    }
+
+    public Task ClearUserCart(int userId)
+    {
+        throw new NotImplementedException();
     }
 }

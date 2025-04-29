@@ -25,7 +25,7 @@ else
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
-                @if (annonce.Status == "Behandler") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
+                @if (annonce.Status == "Behandler")
                 {
                     <div class="cirkel" @onclick="() => OpenBudModal(annonce)"><p class="bud">bud</p></div>
                 }
@@ -143,6 +143,7 @@ else
         </div>
     </div>
 }
+
 @if (showBudModal)
 {
     <div class="modal-backdrop">
@@ -163,7 +164,7 @@ else
         </div>
     </div>
 }
-
+-->
 @code {
     User? currentUser;
     List<Product>? _dineAnnoncer;
@@ -202,7 +203,6 @@ else
         }
         
         
-        // Hent alle rum fra databasen og tilføj navnet til listen af Rooms der kan vælges når man laver sin annonce
         var rooms = await roomService.GetRooms();
         foreach (var r in rooms)
         {
@@ -216,7 +216,6 @@ else
         
         if (_dineAnnoncer != null)
         {
-            // Indsæt hvert billede for hvert product
             foreach (var p in _dineAnnoncer)
             {
                 if (p.Picture != null)
@@ -297,17 +296,27 @@ else
     {
         showBudModal = false;
     }
+ 
+    private async void JaBudModal()
+    {
+        await productService.AcceptBid(bidProductId, currentUser.id); 
+        showBudModal = false;
 
-    private void JaBudModal()
-    {
-        productService.AcceptBid(bidProductId, currentUser.id);
-        showBudModal = false;
+        await LoadAnnoncer(); 
+        StateHasChanged();
     }
-    private void NejBudModal()
+    private async void NejBudModal()
     {
-        productService.DeclineBid(bidProductId, currentUser.id);
+        await productService.DeclineBid(bidProductId, currentUser.id);
         showBudModal = false;
+
+        await LoadAnnoncer(); 
+        StateHasChanged();
     }
+
+
+
+    
     private void AddNewAnnonce()
     {
         editing = false;

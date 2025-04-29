@@ -55,18 +55,20 @@ public class ProductServiceServer : IProductService
         _client.PutAsJsonAsync($"{BaseURL}/update/{id}/{userId}", product);
     }
     
-    public void AcceptBid(int productId, int sellerId)
+    public Task AcceptBid(int productId, int sellerId)
     {
-        _client.PutAsJsonAsync($"{BaseURL}/accept/{productId}/{sellerId}", productId);
+        return _client.PutAsJsonAsync($"{BaseURL}/accept/{productId}/{sellerId}", productId);
     }
-    
-    public void DeclineBid(int productId, int sellerId)
+
+    public Task DeclineBid(int productId, int sellerId)
     {
-        _client.PutAsJsonAsync($"{BaseURL}/decline/{productId}/{sellerId}", productId);
+        return _client.PutAsJsonAsync($"{BaseURL}/decline/{productId}/{sellerId}", productId);
     }
+
     
-    public void BidOnProduct(int productId, int buyerId)
+    public Task BidOnProduct(int productId, int buyerId)
     {
         _client.PutAsJsonAsync($"{BaseURL}/bid/{productId}/{buyerId}", productId);
+        return Task.CompletedTask; // Bare så vi slipper for void
     }
 }

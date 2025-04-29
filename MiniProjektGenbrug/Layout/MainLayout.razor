@@ -3,6 +3,8 @@
 @using Core
 @inject IProductService ProductService
 @inject IUserService loginService
+@inject ICartService cartService
+@inject IProductService productService
 
 <div class="page">
     <div class="sidebar">
@@ -11,22 +13,22 @@
 
     <main id="main">
         <div id="LogDiv">
-            
             @if (currentUser == null)
-        {
-            <a class="login glyphicon glyphicon-log-in" href="login"></a> //Login
-            <p class="underlogtekst">Har du ikke en bruger?  <a href="opret">opret</a> her</p>
-        }
-        else
-        {
-            <p class="login">&#128100;</p> //Logget ind
-            <a class="underlogtekst lakind" @onclick="Logout" href="/">Logud</a>
-        }
-</div>
+            {
+                <a class="login glyphicon glyphicon-log-in" href="login"></a>
+                <p class="underlogtekst">Har du ikke en bruger? <a href="opret">opret</a> her</p>
+            }
+            else
+            {
+                <p class="login">&#128100;</p>
+                <a class="underlogtekst lakind" @onclick="Logout" href="/">Logud</a>
+            }
+        </div>
+
         <div id="checkud" @onclick="ToggleCartPanel">
             <i class="fa fa-shopping-cart" style="font-size:36px"></i>
             <div id="indkøbstal">
-                <p id="tal">@cartItems.Count</p>
+                <p id="tal">@cartItems?.Count</p>
             </div>
         </div>
 
@@ -36,27 +38,26 @@
                 <button class="close-button" @onclick="ToggleCartPanel">×</button>
                 <h4>Min Anmodningskurv</h4>
 
-                @if (cartItems.Any())
+                @if (cartItems?.Any() == true)
                 {
-                    <ul>
-                        @foreach (var product in cartItems)
-                        {
-                            <li style="display: flex; justify-content: space-between; align-items: center;">
-                                <span>@product.Productname - @product.Price.ToString("C")</span>
-                                <button class="delete-button" @onclick="() => RemoveFromCart(product)">Slet</button>
-                            </li>
-                        }
-                    </ul>
+                    @foreach (var item in cartItems)
+                    {
+                        <li style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>@item.Product?.Productname - @item.Product?.Price.ToString("C")</span>
+                            <button class="delete-button" @onclick="() => RemoveFromCart(item)">Slet</button>
+                            <Button @onclick="() => Bid(item.Product)">Byd</Button>
+                        </li>
+                    }
+
                 }
                 else
                 {
                     <p>Kurven er tom</p>
                 }
+                
 
-                <div class="buttons-container">
-                    <button class="checkout-button">Gå til betaling</button>
                 </div>
-            </div>
+           
         }
 
         <article class="content px-4">
@@ -67,34 +68,64 @@
 
 @code {
     private bool show = false;
-    private List<Product> cartItems = new()
-    {
-        new Product { Productname = "Eksempel", Price = 99.99 }
-    };
-
+    private List<CartItem> cartItems = new(); 
     private User? currentUser;
 
     protected override async Task OnInitializedAsync()
     {
+        await HentBrugerOgKurv();
+    }
+
+    private async Task HentBrugerOgKurv()
+    {
         currentUser = await loginService.GetUserLoggedIn();
+
+        if (currentUser != null)
+        {
+            cartItems = (await cartService.GetCartItemsAsync(currentUser.id)).ToList();
+        }
     }
 
     private void ToggleCartPanel()
     {
         show = !show;
-        Console.WriteLine($"Cartpanel vises: {show}");
     }
 
-    private void RemoveFromCart(Product product)
+    private async Task RemoveFromCart(CartItem cartItem)
     {
-        cartItems.Remove(product);
+        if (currentUser == null) return;
+
+        await cartService.RemoveFromCartAsync(currentUser.id, cartItem.ProductId);
+        cartItems.Remove(cartItem);
+        StateHasChanged();
     }
 
     private async Task Logout()
     {
         await loginService.Logout();
         currentUser = null;
+        cartItems.Clear();
         StateHasChanged();
+    }
+
+    public async Task AddToCart(Product product)
+    {
+        if (currentUser == null) return;
+
+        await cartService.AddProductToCartAsync(currentUser.id, product);
+        cartItems = (await cartService.GetCartItemsAsync(currentUser.id)).ToList();
+        StateHasChanged(); //fixer, at man skal genindlæse siden.
+        
         
     }
-}
+    private async Task Bid(Product product)
+    {
+        await productService.BidOnProduct(product.id, currentUser.id);
+    }
+
+
+    }
+
+
+        }
+

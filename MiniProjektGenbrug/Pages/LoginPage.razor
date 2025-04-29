@@ -13,34 +13,34 @@
 <p>@message</p>
 
 @code {
-  string username;
-  string password;
-  string message;
+    string username;
+    string password;
+    string message;
 
-  protected override async Task OnInitializedAsync()
-  {
-    var user = await userService.GetUserLoggedIn();
-    if (user != null)
+    protected override async Task OnInitializedAsync()
     {
-      nav.NavigateTo("/", true);
+        var user = await userService.GetUserLoggedIn();
+        if (user != null)
+        {
+            nav.NavigateTo("/", true);
+        }
     }
-  }
 
-  private async Task TryLogin()
-  {
-    var user = await userService.Login(username, password);
+    private async Task TryLogin()
+    {
+        var user = await userService.Login(username, password);
 
-    if (user.Username != null)
-    {
-      await localStorage.SetItemAsync("user", user);
-      nav.NavigateTo("/", forceLoad: true);
-    }
-    else
-    {
-      message = "Wrong Username or Password";
-    }
+        if (user.Username != null)
+        {
+            await localStorage.SetItemAsync("user", user);
+            nav.NavigateTo("/", forceLoad: true);
+        }
+        else
+        {
+            message = "Wrong Username or Password";
+        }
     
-  }
+    }
 
 
 }

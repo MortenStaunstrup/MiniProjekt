@@ -6,7 +6,7 @@ public interface IUserRepository
 {
     Task<User?> GetUserByEmail(string email);
     
-    Task<User?> GetUserById(int? userId);
+    Task<User?> GetUserById(int userId);
 
     Task AddUser(User user);
 
@@ -17,4 +17,5 @@ public interface IUserRepository
     Task<List<Product>> GetBuyHistoryByUserId(int userId);
 
     Task<int> GetMaxUserId();
+    Task UpdateUser(User user);
 }

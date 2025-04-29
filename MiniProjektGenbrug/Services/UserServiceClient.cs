@@ -26,7 +26,7 @@ namespace MiniProjektGenbrug.Services
 
         public async Task<User?> GetUserById(int? id)
         {
-            var user = await _httpClient.GetFromJsonAsync<User>($"{BaseURL}/getbyid/{id}");
+            var user = await _httpClient.GetFromJsonAsync<User>($"/api/users/{id}");
             return user;
         }
 
@@ -58,5 +58,9 @@ namespace MiniProjektGenbrug.Services
             await _localStorage.RemoveItemAsync("user");
         }
 
+        public Task UpdateUser(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

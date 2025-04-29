@@ -24,7 +24,10 @@ public class User
     
     [Required]
     public string Role { get; set; }
+    
 
     public List<Product> Products { get; set; } = new List<Product>();
+    
+    public List<CartItem> Cart { get; set; } = new();
     public List<Product> BuyHistory { get; set; } = new List<Product>();
 }

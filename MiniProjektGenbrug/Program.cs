@@ -14,12 +14,15 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(sp => new HttpClient
 {
-    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    BaseAddress = new Uri("http://localhost:5189/")
 });
+
 builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddSingleton<IProductService, ProductServiceServer>();
 builder.Services.AddSingleton<IRoomService, RoomServiceServer>();
 builder.Services.AddScoped<IUserService, UserServiceClient>();
+builder.Services.AddScoped<ICartService, CartService>();
+
 
 await builder.Build().RunAsync();
