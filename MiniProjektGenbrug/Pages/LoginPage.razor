@@ -22,7 +22,7 @@
     var user = await userService.GetUserLoggedIn();
     if (user != null)
     {
-      nav.NavigateTo("home");
+      nav.NavigateTo("/", true);
     }
   }
 

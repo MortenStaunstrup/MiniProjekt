@@ -37,11 +37,12 @@ namespace MiniProjektGenbrug.Services
 
         public async Task<User?> CreateUserAsync(string username, string email, string password)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/users/register", new
+            var response = await _httpClient.PostAsJsonAsync($"{BaseURL}/register", new
             {
                 Username = username,
                 Email = email,
-                Password = password
+                Password = password,
+                Role = "User"
             });
 
             if (!response.IsSuccessStatusCode)
