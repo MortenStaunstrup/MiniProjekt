@@ -31,7 +31,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    [Route("gethistorybyid/{id:int}")]
+    [Route("gethistorybyid/{userId:int}")]
     public async Task<List<Product>?> GetBuyHistoryByUserId(int userId)
     {
         return await _productRepository.GetBuyHistoryByUserId(userId);
@@ -42,6 +42,13 @@ public class ProductController : ControllerBase
     public async Task<Product> GetProductById(int id)
     {
         return await _productRepository.GetProductById(id);
+    }
+
+    [HttpGet]
+    [Route("exist/{buyerId:int}/{productId:int}")]
+    public async Task<bool> ExistsInOwnProducts(int productId, int buyerId)
+    {
+        return await _productRepository.ExistsInOwnProducts(productId, buyerId);
     }
 
     [HttpPost]
@@ -64,6 +71,27 @@ public class ProductController : ControllerBase
     public void DeleteProductById(int id, int userId)
     {
         _productRepository.DeleteProductById(id, userId);
+    }
+
+    [HttpPut]
+    [Route("accept/{productId:int}/{sellerId:int}")]
+    public void AcceptBid(int productId, int sellerId)
+    {
+        _productRepository.AcceptBid(productId, sellerId);
+    }
+
+    [HttpPut]
+    [Route("decline/{productId:int}/{sellerId:int}")]
+    public void DeclineBid(int productId, int sellerId)
+    {
+        _productRepository.DeclineBid(productId, sellerId);
+    }
+
+    [HttpPut]
+    [Route("bid/{productId:int}/{buyerId:int}")]
+    public void BidOnProduct(int productId, int buyerId)
+    {
+        _productRepository.BidOnProduct(productId, buyerId);
     }
     
 }

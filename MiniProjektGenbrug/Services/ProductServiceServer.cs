@@ -30,6 +30,11 @@ public class ProductServiceServer : IProductService
         return await _client.GetFromJsonAsync<List<Product>>($"{BaseURL}/gethistorybyid/{userId}");
     }
 
+    public async Task<bool> ExistsInOwnProducts(int productId, int buyerId)
+    {
+        return await _client.GetFromJsonAsync<bool>($"{BaseURL}/exist/{buyerId}/{productId}");
+    }
+
     public async Task<Product?> GetProductById(int id)
     {
         return await _client.GetFromJsonAsync<Product>($"{BaseURL}/getbyid/{id}");
@@ -48,5 +53,20 @@ public class ProductServiceServer : IProductService
     public void UpdateProductById(int id, int userId, Product product)
     {
         _client.PutAsJsonAsync($"{BaseURL}/update/{id}/{userId}", product);
+    }
+    
+    public void AcceptBid(int productId, int sellerId)
+    {
+        _client.PutAsJsonAsync($"{BaseURL}/accept/{productId}/{sellerId}", productId);
+    }
+    
+    public void DeclineBid(int productId, int sellerId)
+    {
+        _client.PutAsJsonAsync($"{BaseURL}/decline/{productId}/{sellerId}", productId);
+    }
+    
+    public void BidOnProduct(int productId, int buyerId)
+    {
+        _client.PutAsJsonAsync($"{BaseURL}/bid/{productId}/{buyerId}", productId);
     }
 }

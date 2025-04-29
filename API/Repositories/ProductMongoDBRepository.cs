@@ -90,9 +90,10 @@ public class ProductMongoDBRepository : IProductRepository
                 if(p.PictureId != null)
                     p.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(p.PictureId));
             }
+            Console.WriteLine("Return BuyHistory with products");
             return productList;
         }
-        
+        Console.WriteLine("Return BuyHistory WITHOUT products");
         return productList;
     }
 
@@ -104,6 +105,70 @@ public class ProductMongoDBRepository : IProductRepository
             if(result.PictureId != null)
                 result.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(result.PictureId));
         return result;
+    }
+
+    public async void BidOnProduct(int productId, int buyerId)
+    {
+        var filter = Builders<Product>.Filter.Eq(x => x.id, productId);
+        var update = Builders<Product>.Update.Set("Status", "Behandler").Set("BuyerId", buyerId);
+        await collection.UpdateOneAsync(filter, update);
+
+        var userFilter = Builders<User>.Filter;
+        var userAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.Products, c => c.id == productId));
+        var updateUser  = Builders<User>.Update.Set("Products.$.Status", "Behandler").Set("Products.$.BuyerId", buyerId);
+        await collectionUser.FindOneAndUpdateAsync(userAndProductFilter, updateUser);
+        
+        var product = await GetProductById(productId);
+        if (product.PictureId != null)
+            product.Picture = null;
+        
+        var sellerBuyFilter = Builders<Core.User>.Filter.Eq(x => x.id, buyerId);
+        var updateSeller = Builders<Core.User>.Update.Push("BuyHistory", product);
+        await collectionUser.FindOneAndUpdateAsync(sellerBuyFilter, updateSeller);
+        
+    }
+
+    public async void AcceptBid(int productId, int sellerId)
+    {
+        var filter = Builders<Product>.Filter.Eq(x => x.id, productId);
+        var update = Builders<Product>.Update.Set("Status", "Gennemført");
+        await collection.UpdateOneAsync(filter, update);
+        
+        var userFilter = Builders<User>.Filter;
+        var sellerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.Products, c => c.id == productId));
+        var buyerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.BuyHistory, c => c.id == productId));
+        var updateSeller = Builders<User>.Update.Set("Products.$.Status", "Gennemført");
+        var updateBuyer = Builders<User>.Update.Set("BuyHistory.$.Status", "Gennemført");
+        await collectionUser.FindOneAndUpdateAsync(sellerAndProductFilter, updateSeller);
+        await collectionUser.FindOneAndUpdateAsync(buyerAndProductFilter, updateBuyer);
+
+    }
+
+    public async void DeclineBid(int productId, int sellerId)
+    {
+        var userFilter = Builders<User>.Filter;
+        var sellerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.Products, c => c.id == productId));
+        var buyerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.BuyHistory, c => c.id == productId));
+        var updateSeller = Builders<User>.Update.Set("Products.$.Status", "Available");
+        var updateBuyer = Builders<User>.Update.PullFilter<Product>(x => x.BuyHistory, x => x.id == productId);
+        await collectionUser.FindOneAndUpdateAsync(sellerAndProductFilter, updateSeller);
+        await collectionUser.FindOneAndUpdateAsync(buyerAndProductFilter, updateBuyer);
+        
+        
+        var filter = Builders<Product>.Filter.Eq(x => x.id, productId);
+        var update = Builders<Product>.Update.Set("Status", "Available");
+        await collection.UpdateOneAsync(filter, update);
+    }
+
+    public async Task<bool> ExistsInOwnProducts(int productId, int buyerId)
+    {
+        var userFilter = Builders<User>.Filter.Eq(x => x.id, buyerId);
+        var productFilter = Builders<User>.Filter.ElemMatch(x => x.Products, p => p.id == productId);
+        var userAndProductFilter = Builders<User>.Filter.And(userFilter, productFilter);
+        var result = await collectionUser.Aggregate().Match(userAndProductFilter).SingleOrDefaultAsync();
+        if (result != null)
+            return true;
+        return false;
     }
 
     public async Task<int> GetMaxProductId()
@@ -136,7 +201,7 @@ public class ProductMongoDBRepository : IProductRepository
         Console.WriteLine("Adding product to DB");
     }
 
-    public async void UpdateProductById(int id, Product product, int userId)
+    public async void UpdateProductById(int id, Product product, int sellerId)
     {
         var productWId = await GetProductById(id);
         productWId.Productname = product.Productname;
@@ -158,7 +223,7 @@ public class ProductMongoDBRepository : IProductRepository
         await collection.ReplaceOneAsync(filter, productWId);
         
         var filterUser = Builders<User>.Filter;
-        var filterUserAndProduct = filterUser.And(filterUser.Eq(x => x.id, userId), filterUser.ElemMatch(x => x.Products, c => c.id == productWId.id));
+        var filterUserAndProduct = filterUser.And(filterUser.Eq(x => x.id, sellerId), filterUser.ElemMatch(x => x.Products, c => c.id == productWId.id));
         
         var update = Builders<User>.Update.Set("Products.$", productWId);
         

@@ -25,9 +25,9 @@ else
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
-                @if (annonce.Status == "Bud") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
+                @if (annonce.Status == "Behandler") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
                 {
-                    <div class="cirkel" @onclick="OpenBudModal"><p class="bud">bud</p></div>
+                    <div class="cirkel" @onclick="() => OpenBudModal(annonce)"><p class="bud">bud</p></div>
                 }
                 <div class="Divpic">
                     <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item"/>
@@ -40,10 +40,17 @@ else
                     <span>@annonce.Size</span>
                     <span>@annonce.Description</span>
                     <span>@annonce.Price,- DKK</span>
-                    <div id="knapper">
-                        <button id="RedigereKnap" @onclick="() => UpdateAnnonce(annonce)">Rediger</button>
-                        <button id="SletKnap" @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
-                    </div>
+                    @if (annonce.Status == "Behandler" || annonce.Status == "Gennemført")
+                    {
+                        
+                    }
+                    else
+                    {
+                        <div id="knapper">
+                            <button id="RedigereKnap" @onclick="() => UpdateAnnonce(annonce)">Rediger</button>
+                            <button id="SletKnap" @onclick="() => DeleteAnnonce(annonce.id)">Slet</button>
+                        </div>
+                    }
                 </div>
             </div>
         }
@@ -141,11 +148,18 @@ else
     <div class="modal-backdrop">
         <div class="bud-modal-content">
             <button class="close-button" @onclick="CloseBudModal">X</button>
-            <h3>Thomas har budt 500kr på dine sko</h3>
-            <div class="bud-buttons">
-                <button class="btn btn-primary" @onclick="JaBudModal">Ja</button>
-                <button class="btn btn-primary" @onclick="NejBudModal">Nej</button>
-            </div>
+            @if (bidderUser == null)
+            {
+                <p>loading bidder...</p>
+            }
+            else
+            {
+                <h3>@bidderUser.Username har budt @bidProduct.Price på din @bidProduct.Productname</h3>
+                <div class="bud-buttons">
+                    <button class="btn btn-primary" @onclick="JaBudModal">Ja</button>
+                    <button class="btn btn-primary" @onclick="NejBudModal">Nej</button>
+                </div>
+            }
         </div>
     </div>
 }
@@ -158,6 +172,9 @@ else
     private Product model;
     private EditContext EditContext;
     bool showBudModal = false;
+    int bidProductId;
+    Product bidProduct;
+    User bidderUser;
 
     private byte[] pictureBytes;
     
@@ -250,7 +267,7 @@ else
                 productService.AddProduct(model, currentUser.id);
                 Console.WriteLine("Annonce tilføjet:");
                 Console.WriteLine($"{model.Productname} - {model.Price} - {model.Category}");
-                await LoadAnnoncer();
+                navMan.NavigateTo(navMan.Uri, true);
             }
             else
             {
@@ -267,9 +284,13 @@ else
             Console.WriteLine("Annonce fejlet");
         }
     }
-    private void OpenBudModal()
+    private async void OpenBudModal(Product product)
     {
+        bidProductId = product.id;
+        bidProduct = product;
         showBudModal = true;
+        bidderUser = await userService.GetUserById(product.BuyerId);
+        StateHasChanged();
     }
 
     private void CloseBudModal()
@@ -279,10 +300,12 @@ else
 
     private void JaBudModal()
     {
+        productService.AcceptBid(bidProductId, currentUser.id);
         showBudModal = false;
     }
     private void NejBudModal()
     {
+        productService.DeclineBid(bidProductId, currentUser.id);
         showBudModal = false;
     }
     private void AddNewAnnonce()

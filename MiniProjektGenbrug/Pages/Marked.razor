@@ -57,6 +57,7 @@ else
             if (article.Status != "Gennemført")
             {
                 <div class="indholdprvare" @onclick="() => OpenModal(article)" style="cursor: pointer;">
+ 
                     <div class="DivPic">
                         <img src="@(article.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" />
                     </div>
@@ -72,6 +73,7 @@ else
         }
     </div>
 }
+
 
 @if (showModal && selectedProduct != null)
 {
@@ -121,6 +123,7 @@ else
 </style>
 
         @code {
+
     private string SearchText;
     private string SelectedCategory = "";
     private string SelectedColor = "";
@@ -131,6 +134,9 @@ else
     private List<Product> _products;
     private List<Product> _filteredProducts;
     private User? currentUser;
+    bool showModal = false;
+    Product shownProduct;
+    bool exist;
 
     private Product selectedProduct;
     private bool showModal = false;
@@ -197,9 +203,30 @@ else
         currentUser = user;
         showModal = false;
     }
-    -->
 
-}
 
-    </div>
+    private void BidOnProduct()
+    {
+        _ProductService.BidOnProduct(shownProduct.id, currentUser.id);
+        navMan.NavigateTo("mineindkob");
+    }
+
+    private async void OpenItem(Product product)
+    {
+        shownProduct = product;
+        OpenModal();
+        exist = await _ProductService.ExistsInOwnProducts(shownProduct.id, currentUser.id);
+        StateHasChanged();
+    }
+    
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private void OpenModal()
+    {
+        showModal = true;
+    }
+
 }

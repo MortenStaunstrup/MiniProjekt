@@ -71,12 +71,9 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("getbyid/{id:int}")]
-    public async Task<IActionResult> GetUserById(int id)
+    public async Task<User> GetUserById(int id)
     {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null)
-            return NotFound("User not found.");
-        return Ok(user);
+        return await _userRepository.GetUserById(id);
     }
 
     [HttpGet]
