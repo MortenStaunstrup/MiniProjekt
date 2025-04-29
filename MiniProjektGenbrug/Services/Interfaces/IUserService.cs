@@ -8,7 +8,7 @@ namespace MiniProjektGenbrug.Services.Interfaces
     public interface IUserService
     {
         Task<User?> GetUserLoggedIn();
-        Task<User?> GetUserById(int id);
+        Task<User?> GetUserById(int? id);
         Task<User?> Login(string username, string password);
         Task<User> CreateUserAsync(string username, string email, string password);
         Task Logout();

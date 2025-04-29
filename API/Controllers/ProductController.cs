@@ -44,6 +44,13 @@ public class ProductController : ControllerBase
         return await _productRepository.GetProductById(id);
     }
 
+    [HttpGet]
+    [Route("exist/{buyerId:int}/{productId:int}")]
+    public async Task<bool> ExistsInOwnProducts(int productId, int buyerId)
+    {
+        return await _productRepository.ExistsInOwnProducts(productId, buyerId);
+    }
+
     [HttpPost]
     [Route("add/{userId:int}")]
     public void AddProduct(Product product, int userId)

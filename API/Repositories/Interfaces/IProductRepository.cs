@@ -11,6 +11,7 @@ public interface IProductRepository
     void BidOnProduct(int productId, int buyerId);
     void AcceptBid(int productId, int sellerId);
     void DeclineBid(int productId, int sellerId);
+    Task<bool> ExistsInOwnProducts(int productId, int buyerId);
     void AddProduct(Product product, int userId);
     Task<int> GetMaxProductId();
     void UpdateProductById(int id, Product product, int userId);

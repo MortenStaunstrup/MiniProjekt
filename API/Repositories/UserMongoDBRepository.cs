@@ -19,7 +19,7 @@ public class UserMongoDBRepository : IUserRepository
         collection = database.GetCollection<User>("Users");
     }
     
-    public async Task<User?> GetUserById(int id)
+    public async Task<User?> GetUserById(int? id)
     {
         var filter = Builders<User>.Filter.Eq(u => u.id, id);
         return await collection.Find(filter).FirstOrDefaultAsync();

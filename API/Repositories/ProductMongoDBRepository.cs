@@ -160,6 +160,17 @@ public class ProductMongoDBRepository : IProductRepository
         await collection.UpdateOneAsync(filter, update);
     }
 
+    public async Task<bool> ExistsInOwnProducts(int productId, int buyerId)
+    {
+        var userFilter = Builders<User>.Filter.Eq(x => x.id, buyerId);
+        var productFilter = Builders<User>.Filter.ElemMatch(x => x.Products, p => p.id == productId);
+        var userAndProductFilter = Builders<User>.Filter.And(userFilter, productFilter);
+        var result = await collectionUser.Aggregate().Match(userAndProductFilter).SingleOrDefaultAsync();
+        if (result != null)
+            return true;
+        return false;
+    }
+
     public async Task<int> GetMaxProductId()
     {
         var sort = Builders<Product>.Sort.Descending(x => x.id);
@@ -190,7 +201,7 @@ public class ProductMongoDBRepository : IProductRepository
         Console.WriteLine("Adding product to DB");
     }
 
-    public async void UpdateProductById(int id, Product product, int userId)
+    public async void UpdateProductById(int id, Product product, int sellerId)
     {
         var productWId = await GetProductById(id);
         productWId.Productname = product.Productname;
@@ -212,7 +223,7 @@ public class ProductMongoDBRepository : IProductRepository
         await collection.ReplaceOneAsync(filter, productWId);
         
         var filterUser = Builders<User>.Filter;
-        var filterUserAndProduct = filterUser.And(filterUser.Eq(x => x.id, userId), filterUser.ElemMatch(x => x.Products, c => c.id == productWId.id));
+        var filterUserAndProduct = filterUser.And(filterUser.Eq(x => x.id, sellerId), filterUser.ElemMatch(x => x.Products, c => c.id == productWId.id));
         
         var update = Builders<User>.Update.Set("Products.$", productWId);
         
