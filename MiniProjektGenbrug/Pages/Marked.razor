@@ -52,18 +52,25 @@ else
     <div class="modal-backdrop">
         <div class="modal-content">
             <button class="close-button" @onclick="CloseModal">X</button>
-
-            <h3>@shownProduct.Productname</h3>
-            <p>Price: @shownProduct.Price</p>
-            <p>Kan findes i lokale: @shownProduct.RoomName</p>
             
-            @if (!exist)
+            @if (currentUser == null)
             {
-                <button @onclick="BidOnProduct">Byd på vare?</button>
+                <p>Please login to bid on this product</p>
             }
             else
             {
-                <p>You own this product</p>
+                <h3>@shownProduct.Productname</h3>
+                <p>Price: @shownProduct.Price</p>
+                <p>Kan findes i lokale: @shownProduct.RoomName</p>
+                
+                @if (!exist)
+                {
+                    <button @onclick="BidOnProduct">Byd på vare?</button>
+                }
+                else
+                {
+                    <p>You own this product</p>
+                }
             }
         </div>
     </div>
@@ -132,7 +139,8 @@ else
     {
         shownProduct = product;
         OpenModal();
-        exist = await _ProductService.ExistsInOwnProducts(shownProduct.id, currentUser.id);
+        if(currentUser != null)
+            exist = await _ProductService.ExistsInOwnProducts(shownProduct.id, currentUser.id);
         StateHasChanged();
     }
     
