@@ -128,14 +128,36 @@ public class ProductMongoDBRepository : IProductRepository
         
     }
 
-    public void AcceptBid(int productId, int sellerId)
+    public async void AcceptBid(int productId, int sellerId)
     {
+        var filter = Builders<Product>.Filter.Eq(x => x.id, productId);
+        var update = Builders<Product>.Update.Set("Status", "Gennemført");
+        await collection.UpdateOneAsync(filter, update);
         
+        var userFilter = Builders<User>.Filter;
+        var sellerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.Products, c => c.id == productId));
+        var buyerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.BuyHistory, c => c.id == productId));
+        var updateSeller = Builders<User>.Update.Set("Products.$.Status", "Gennemført");
+        var updateBuyer = Builders<User>.Update.Set("BuyHistory.$.Status", "Gennemført");
+        await collectionUser.FindOneAndUpdateAsync(sellerAndProductFilter, updateSeller);
+        await collectionUser.FindOneAndUpdateAsync(buyerAndProductFilter, updateBuyer);
+
     }
 
-    public void DeclineBid(int productId, int sellerId)
+    public async void DeclineBid(int productId, int sellerId)
     {
+        var userFilter = Builders<User>.Filter;
+        var sellerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.Products, c => c.id == productId));
+        var buyerAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.BuyHistory, c => c.id == productId));
+        var updateSeller = Builders<User>.Update.Set("Products.$.Status", "Available");
+        var updateBuyer = Builders<User>.Update.PullFilter<Product>(x => x.BuyHistory, x => x.id == productId);
+        await collectionUser.FindOneAndUpdateAsync(sellerAndProductFilter, updateSeller);
+        await collectionUser.FindOneAndUpdateAsync(buyerAndProductFilter, updateBuyer);
         
+        
+        var filter = Builders<Product>.Filter.Eq(x => x.id, productId);
+        var update = Builders<Product>.Update.Set("Status", "Available");
+        await collection.UpdateOneAsync(filter, update);
     }
 
     public async Task<int> GetMaxProductId()
