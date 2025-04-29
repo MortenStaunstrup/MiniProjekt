@@ -1,0 +1,38 @@
+@inject IRoomService roomService
+@using Core
+
+
+@page "/faciliteter"
+@using MiniProjektGenbrug.Services.Interfaces
+<h1>Faciliteter</h1>
+
+@if (rooms != null && rooms.Any())
+{
+    <div class="room-container">
+        @foreach (var room in rooms)
+        {
+            <div class="room-card">
+                <div class="room-content">
+                    <h3>@room.Name</h3>
+                    <p><strong>Åbningstid:</strong> @room.OpeningHour.ToShortTimeString()</p>
+                    <p><strong>Lukketid:</strong> @room.ClosingHour.ToShortTimeString()</p>
+                    <p><strong>Bemanding:</strong> @room.Staffing personer</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Indlæser faciliteter...</p>
+}
+
+
+@code {
+    private List<Room> rooms = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await roomService.GetRooms();
+    }
+}
