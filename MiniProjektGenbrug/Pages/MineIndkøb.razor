@@ -1,33 +1,57 @@
 @page "/mineindkob"
+@using Blazored.LocalStorage
+@using Core
+@using MiniProjektGenbrug.Services.Interfaces
+@inject IUserService userService
+@inject IProductService productService
+@inject NavigationManager navMan
 
-<div class="mine-indkob-container">
-    <h2>Mine indkøb</h2>
+@if (_buyHistory == null)
+{
+    <p><i>...loading buy history</i></p>
+}
+else
+{
+    <div class="mine-indkob-container">
+        <h2>Mine indkøb</h2>
 
-    <div class="indkob-item">
-        <div class="product-info">
-            <h3>Air force 1</h3>
-            <p>500kr</p>
-            <p>Lokale: A101</p>
-            <p>Sko, hvid, 44</p>
-            <p>Har valgt at sælge min airforce 1</p>
-        </div>
-        <div class="purchase-status">
-            <p>Dato: 29/04</p>
-            <p>Status: Behandler</p>
-        </div>
+        @foreach (var p in _buyHistory)
+        {
+            <div class="indkob-item">
+                <div class="product-info">
+                    <h3>@p.Productname</h3>
+                    <p>@p.Price</p>
+                    <p>Lokale: @p.RoomName</p>
+                    <p>@p.Category, @p.Color, @p.Size</p>
+                    <p>@p.Description</p>
+                </div>
+                <div class="purchase-status">
+                    <p>Dato: 29/04</p>
+                    <p>Status: @p.Status</p>
+                </div>
+            </div>
+        }
     </div>
+}
 
-    <div class="indkob-item">
-        <div class="product-info">
-            <h3>Jeans</h3>
-            <p>250kr</p>
-            <p>Lokale: B102</p>
-            <p>Jeans, blå, str. M</p>
-            <p>Har valgt at sælge mine jeans</p>
-        </div>
-        <div class="purchase-status">
-            <p>Dato: 19/03</p>
-            <p>Status: Gennemført</p>
-        </div>
-    </div>
-</div>
+
+
+@code{
+    User? currentUser;
+    List<Product> _buyHistory;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await userService.GetUserLoggedIn();
+        if (currentUser == null)
+        {
+            navMan.NavigateTo("login");
+        }
+        else
+        {
+            _buyHistory = await productService.GetBuyHistoryByUserId(currentUser.id);
+        }
+    }
+
+
+}

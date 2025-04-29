@@ -25,9 +25,9 @@ else
         @foreach (var annonce in _dineAnnoncer)
         {
             <div class="indholdprvare">
-                @if (annonce.Status == "Bud") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
+                @if (annonce.Status == "Behandler") /*Brug editing == false til at test ---- Rigtige er annonce.Status == "Bud"*/
                 {
-                    <div class="cirkel" @onclick="OpenBudModal"><p class="bud">bud</p></div>
+                    <div class="cirkel" @onclick="() => OpenBudModal(annonce.id)"><p class="bud">bud</p></div>
                 }
                 <div class="Divpic">
                     <img src="@(annonce.PictureSrc != null ? annonce.PictureSrc : "sample-data/noImgAvailable.png")" alt="Picture of Item"/>
@@ -158,6 +158,7 @@ else
     private Product model;
     private EditContext EditContext;
     bool showBudModal = false;
+    int bidProductId;
 
     private byte[] pictureBytes;
     
@@ -267,8 +268,9 @@ else
             Console.WriteLine("Annonce fejlet");
         }
     }
-    private void OpenBudModal()
+    private void OpenBudModal(int productId)
     {
+        bidProductId = productId;
         showBudModal = true;
     }
 
@@ -279,10 +281,12 @@ else
 
     private void JaBudModal()
     {
+        productService.AcceptBid(bidProductId, currentUser.id);
         showBudModal = false;
     }
     private void NejBudModal()
     {
+        productService.DeclineBid(bidProductId, currentUser.id);
         showBudModal = false;
     }
     private void AddNewAnnonce()

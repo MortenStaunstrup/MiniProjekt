@@ -90,9 +90,10 @@ public class ProductMongoDBRepository : IProductRepository
                 if(p.PictureId != null)
                     p.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(p.PictureId));
             }
+            Console.WriteLine("Return BuyHistory with products");
             return productList;
         }
-        
+        Console.WriteLine("Return BuyHistory WITHOUT products");
         return productList;
     }
 
@@ -104,6 +105,37 @@ public class ProductMongoDBRepository : IProductRepository
             if(result.PictureId != null)
                 result.Picture = Convert.ToBase64String(await bucket.DownloadAsBytesAsync(result.PictureId));
         return result;
+    }
+
+    public async void BidOnProduct(int productId, int buyerId)
+    {
+        var filter = Builders<Product>.Filter.Eq(x => x.id, productId);
+        var update = Builders<Product>.Update.Set("Status", "Behandler").Set("BuyerId", buyerId);
+        await collection.UpdateOneAsync(filter, update);
+
+        var userFilter = Builders<User>.Filter;
+        var userAndProductFilter = userFilter.And(userFilter.Empty, userFilter.ElemMatch(x => x.Products, c => c.id == productId));
+        var updateUser  = Builders<User>.Update.Set("Products.$.Status", "Behandler").Set("Products.$.BuyerId", buyerId);
+        await collectionUser.FindOneAndUpdateAsync(userAndProductFilter, updateUser);
+        
+        var product = await GetProductById(productId);
+        if (product.PictureId != null)
+            product.Picture = null;
+        
+        var sellerBuyFilter = Builders<Core.User>.Filter.Eq(x => x.id, buyerId);
+        var updateSeller = Builders<Core.User>.Update.Push("BuyHistory", product);
+        await collectionUser.FindOneAndUpdateAsync(sellerBuyFilter, updateSeller);
+        
+    }
+
+    public void AcceptBid(int productId, int sellerId)
+    {
+        
+    }
+
+    public void DeclineBid(int productId, int sellerId)
+    {
+        
     }
 
     public async Task<int> GetMaxProductId()

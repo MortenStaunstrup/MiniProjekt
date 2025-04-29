@@ -30,7 +30,7 @@ else
         {
             if (article.Status != "Gennemført")
             {
-                <div class="indholdprvare">
+                <div class="indholdprvare" @onclick="() => OpenItem(article)">
                     <div class="DivPic">
                         <img src="@(article.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" />
                     </div>
@@ -47,6 +47,20 @@ else
     </div>
 }
 
+@if (showModal)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <button class="close-button" @onclick="CloseModal">X</button>
+
+            <h3>@shownProduct.Productname</h3>
+            
+            
+            <button @onclick="BidOnProduct">Byd på vare?</button>
+        </div>
+    </div>
+}
+
 @code {
     private string SearchText;
     private string SelectedCategory = "";
@@ -58,6 +72,8 @@ else
     private List<Product> _products;
     private List<Product> _filteredProducts;
     private User? currentUser;
+    bool showModal = false;
+    Product shownProduct;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,4 +112,27 @@ else
             _products = await _ProductService.GetAllProducts(); // Opdaterer tøjet
         }
     }
+
+    private void BidOnProduct()
+    {
+        _ProductService.BidOnProduct(shownProduct.id, currentUser.id);
+        CloseModal();
+    }
+
+    private void OpenItem(Product product)
+    {
+        shownProduct = product;
+        OpenModal();
+    }
+    
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private void OpenModal()
+    {
+        showModal = true;
+    }
+    
 }
