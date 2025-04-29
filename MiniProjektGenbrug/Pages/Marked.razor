@@ -5,8 +5,9 @@
 @inject IRoomService roomService
 @inject NavigationManager navMan
 @inject IUserService loginService
-@inject IRoomService IRoomService
+<!--inject ICartService cartService-->
 @inject Blazored.LocalStorage.ILocalStorageService localstorage
+
 
 <PageTitle>Marked</PageTitle>
 
@@ -18,11 +19,36 @@
 }
 else
 {
-    
-    <div class="input-group mb-3" style="width: 30%">
-        <button class="btn btn-outline-secondary" type="button" id="button-addon1" @onclick="Search">Søg</button>
-        <InputText @bind-Value="@SearchText" type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1"></InputText>
+    <div class="input-group mb-3">
+        <InputText @bind-Value="SearchText" placeholder="Søg..." class="form-control" />
 
+        <InputSelect @bind-Value="SelectedCategory" class="form-select">
+            <option value="">Alle kategorier</option>
+            @foreach (var cat in _products.Where(p => !string.IsNullOrEmpty(p.Category)).Select(p => p.Category).Distinct())
+            {
+                <option value="@cat">@cat</option>
+            }
+        </InputSelect>
+
+        <InputSelect @bind-Value="SelectedColor" class="form-select">
+            <option value="">Alle farver</option>
+            @foreach (var col in _products.Where(p => !string.IsNullOrEmpty(p.Color)).Select(p => p.Color).Distinct())
+            {
+                <option value="@col">@col</option>
+            }
+        </InputSelect>
+
+        <InputSelect @bind-Value="SelectedSize" class="form-select">
+            <option value="">Alle størrelser</option>
+            @foreach (var sz in _products.Where(p => !string.IsNullOrEmpty(p.Size)).Select(p => p.Size).Distinct())
+            {
+                <option value="@sz">@sz</option>
+            }
+        </InputSelect>
+
+        <InputNumber @bind-Value="MinPrice" class="form-control" placeholder="Min pris" />
+        <InputNumber @bind-Value="MaxPrice" class="form-control" placeholder="Max pris" />
+        <button class="btn btn-primary" @onclick="Search">Filtrer</button>
     </div>
 
     <div class="altindhold">
@@ -30,7 +56,8 @@ else
         {
             if (article.Status != "Gennemført")
             {
-                <div class="indholdprvare" @onclick="() => OpenItem(article)">
+                <div class="indholdprvare" @onclick="() => OpenModal(article)" style="cursor: pointer;">
+ 
                     <div class="DivPic">
                         <img src="@(article.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" />
                     </div>
@@ -47,29 +74,56 @@ else
     </div>
 }
 
-@if (showModal)
-{
-    <div class="modal-backdrop">
-        <div class="modal-content">
-            <button class="close-button" @onclick="CloseModal">X</button>
 
-            <h3>@shownProduct.Productname</h3>
-            <p>Price: @shownProduct.Price</p>
-            <p>Kan findes i lokale: @shownProduct.RoomName</p>
-            
-            @if (!exist)
-            {
-                <button @onclick="BidOnProduct">Byd på vare?</button>
-            }
-            else
-            {
-                <p>You own this product</p>
-            }
+@if (showModal && selectedProduct != null)
+{
+    <div class="modal-backdrop" @onclick="CloseModal">
+        <div class="modal-content" @onclick:stopPropagation>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <button class="btn btn-danger" @onclick="CloseModal">Luk</button>
+                <!--
+                <button class="btn btn-success" @onclick="() => AddToCart(selectedProduct)">Tilføj til kurv</button>
+            </div>
+                -->
+                <h2>@selectedProduct.Productname</h2>
+                <img src="@(selectedProduct.PictureSrc ?? "sample-data/noImgAvailable.png")" alt="Billede af vare" style="width: 100%; height: auto;"/>
+                <p>Størrelse: @selectedProduct.Size</p>
+                <p>Farve: @selectedProduct.Color</p>
+                <p>Pris: @selectedProduct.Price,- DKK</p>
+                <p>Rum: @selectedProduct.RoomName</p>
+                <p>Status: @selectedProduct.Status</p>
+            </div>
         </div>
-    </div>
+        }
+
+        <style>
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-@code {
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    position: relative;
+}
+</style>
+
+        @code {
+
     private string SearchText;
     private string SelectedCategory = "";
     private string SelectedColor = "";
@@ -83,6 +137,9 @@ else
     bool showModal = false;
     Product shownProduct;
     bool exist;
+
+    private Product selectedProduct;
+    private bool showModal = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,25 +159,51 @@ else
         _filteredProducts = _products
             .Where(x => string.IsNullOrWhiteSpace(SearchText) ||
                         x.Productname.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                        x.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                        x.Color.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                        x.Category?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true ||
+                        x.Color?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true)
             .Where(x => string.IsNullOrWhiteSpace(SelectedCategory) || x.Category == SelectedCategory)
             .Where(x => string.IsNullOrWhiteSpace(SelectedColor) || x.Color == SelectedColor)
             .Where(x => string.IsNullOrWhiteSpace(SelectedSize) || x.Size == SelectedSize)
             .Where(x => !MinPrice.HasValue || x.Price >= (double)MinPrice.Value)
             .Where(x => !MaxPrice.HasValue || x.Price <= (double)MaxPrice.Value)
             .ToList();
-
-        StateHasChanged();
     }
 
-    private async Task ReturnProduct(int id)
+    private void OpenModal(Product product)
     {
-        if (currentUser != null)
-        {
-            _products = await _ProductService.GetAllProducts(); // Opdaterer tøjet
-        }
+        selectedProduct = product;
+        showModal = true;
     }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+<!--
+    private async Task AddToCart(Product product)
+    {
+        if (currentUser == null)
+            return;
+
+        var user = await loginService.GetUserById(currentUser.id);
+        if (user == null)
+            return;
+
+        var cartItem = new CartItem
+        {
+            Product = product,
+            UserId = user.id,
+            antal = 1         
+        };
+        
+        await cartService.AddProductToCartAsync(user.id, product);
+
+        
+        await localstorage.SetItemAsync("user", user);
+        currentUser = user;
+        showModal = false;
+    }
+
 
     private void BidOnProduct()
     {
@@ -145,5 +228,5 @@ else
     {
         showModal = true;
     }
-    
+
 }
